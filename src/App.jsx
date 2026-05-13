@@ -1,964 +1,1321 @@
 import { useState, useEffect } from "react";
 
 const DAYS = [
-  { key:"seg", label:"Segunda", icon:"🧠", tag:"System Design",    color:"#a78bfa" },
-  { key:"ter", label:"Terça",   icon:"🔧", tag:"Técnico",          color:"#fbbf24" },
-  { key:"qua", label:"Quarta",  icon:"☁️", tag:"Cloud + Security", color:"#60a5fa" },
-  { key:"qui", label:"Quinta",  icon:"📊", tag:"SRE",              color:"#34d399" },
-  { key:"sex", label:"Sexta",   icon:"✍️", tag:"Liderança",        color:"#f472b6" },
+  { key: "seg", label: "Segunda", icon: "🧠", tag: "System Design",    color: "#a78bfa" },
+  { key: "ter", label: "Terça",   icon: "🔧", tag: "Técnico",          color: "#fbbf24" },
+  { key: "qua", label: "Quarta",  icon: "☁️", tag: "Cloud + Security", color: "#60a5fa" },
+  { key: "qui", label: "Quinta",  icon: "📊", tag: "SRE",              color: "#34d399" },
+  { key: "sex", label: "Sexta",   icon: "✍️", tag: "Liderança",        color: "#f472b6" },
 ];
-const PC = { p1:"#f59e0b",p2:"#10b981",p3:"#3b82f6",p4:"#8b5cf6",p5:"#ef4444",p6:"#06b6d4",p7:"#f472b6" };
-const w = (id,num,seg,ter,qua,qui,sex) => ({
+
+const PC = { p1:"#f59e0b", p2:"#10b981", p3:"#3b82f6", p4:"#8b5cf6", p5:"#ef4444", p6:"#06b6d4", p7:"#f472b6" };
+
+const w = (id, num, seg, ter, qua, qui, sex) => ({
   id, num,
-  days:{
-    seg:seg.map((t,i)=>({id:`${id}-s${i}`,text:t[0],url:t[1]||""})),
-    ter:ter.map((t,i)=>({id:`${id}-t${i}`,text:t[0],url:t[1]||""})),
-    qua:qua.map((t,i)=>({id:`${id}-q${i}`,text:t[0],url:t[1]||""})),
-    qui:qui.map((t,i)=>({id:`${id}-i${i}`,text:t[0],url:t[1]||""})),
-    sex:sex.map((t,i)=>({id:`${id}-x${i}`,text:t[0],url:t[1]||""})),
+  days: {
+    seg: seg.map((t,i)=>({id:`${id}-s${i}`,text:t[0],url:t[1]||""})),
+    ter: ter.map((t,i)=>({id:`${id}-t${i}`,text:t[0],url:t[1]||""})),
+    qua: qua.map((t,i)=>({id:`${id}-q${i}`,text:t[0],url:t[1]||""})),
+    qui: qui.map((t,i)=>({id:`${id}-i${i}`,text:t[0],url:t[1]||""})),
+    sex: sex.map((t,i)=>({id:`${id}-x${i}`,text:t[0],url:t[1]||""})),
   }
 });
-// Notion base URL shorthand
-const N = "https://www.notion.so/";
+
 const PHASES = [
-  // ── FASE 1 ── CKA (Meses 1–4, Semanas 1–16) ──────────────────────────────
+  // ─── FASE 1 — Fundação (Meses 1–4) ───────────────────────────────────────
   {
-    id:"p1",num:1,title:"Fundação",period:"Meses 1–4",cert:"🎓 CKA — Meta: Semana 16",
-    goal:"CKA no bolso. Base filosófica de SRE. System Design como linguagem.",
+    id:"p1", num:1, title:"Fundação", period:"Meses 1–4", weeks_label:"Semanas 1–16",
+    cert:"🎓 CKA — Meta: Mês 4",
+    goal:"CKA no bolso. Base filosófica de SRE. System Design como linguagem. Começar a pensar além do squad.",
     months:[
       { title:"Mês 1", weeks:[
-        w("p1w1",1,
+        w("m1w1",1,
           [["CAP Theorem, consistência eventual, trade-offs de sistemas distribuídos","https://github.com/donnemartin/system-design-primer"]],
-          [["Namespaces e Resource Quotas",N+"Namespaces-e-Resource-Quotas-2e7dabadc8df817caf09d98079b797d3"],
-           ["Pods, Deployments, Services, ConfigMaps, Secrets",N+"Pods-Deployments-Services-ConfigMaps-Secrets-2e7dabadc8df811982b9d79c9bf68df3"]],
+          [["Arquitetura do cluster: control plane, etcd, kubelet, API server","https://kubernetes.io/docs/concepts/architecture/"]],
           [["Well-Architected: pilar de Segurança completo","https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"]],
-          [["SRE Book cap. 1–2: O que é SRE, Embracing Risk","https://sre.google/sre-book/embracing-risk/"],
-           ["Leitura: Google SRE Book (capítulos relevantes)",N+"Leitura-Google-SRE-Book-cap-tulos-relevantes-2e7dabadc8df81c59c1ac5cb323cb64f"]],
-          [["Team Topologies cap. 1–2: estrutura de time impacta arquitetura","https://teamtopologies.com/book"],
-           ["Leitura: Team Topologies (livro)",N+"Leitura-Team-Topologies-livro-2e7dabadc8df81dc888ad9dc6082643f"]]),
-        w("p1w2",2,
+          [["SRE Book cap. 1–2: O que é SRE, Embracing Risk","https://sre.google/sre-book/embracing-risk/"]],
+          [["Team Topologies cap. 1–2: estrutura de time impacta arquitetura","https://teamtopologies.com/book"]]),
+        w("m1w2",2,
           [["Padrões de Load Balancing, Caching (L1/L2/CDN), estratégias de invalidação","https://github.com/donnemartin/system-design-primer"]],
-          [["Prática: Deploy de aplicação multi-tier",N+"Pr-tica-Deploy-de-aplica-o-multi-tier-2e7dabadc8df81ca969de5a8c71ff857"],
-           ["StatefulSets e Headless Services",N+"StatefulSets-e-Headless-Services-2e7dabadc8df8146b9cae261366f8b7a"]],
+          [["Workloads: Pod, Deployment, DaemonSet, StatefulSet, Job, CronJob","https://kubernetes.io/docs/concepts/workloads/"]],
           [["IAM avançado: roles, policies, trust policies, cross-account","https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"]],
-          [["SRE Book cap. 3–4: SLOs, SLIs, SLAs — como definir o que importa","https://sre.google/sre-book/service-level-objectives/"],
-           ["SLIs, SLOs, SLAs e Error Budgets",N+"SLIs-SLOs-SLAs-e-Error-Budgets-2e7dabadc8df811e9808c956e5981637"]],
-          [["Team Topologies cap. 3–4: Stream-aligned, Platform, Enabling teams","https://teamtopologies.com/book"],
-           ["ADRs (Architecture Decision Records)",N+"ADRs-Architecture-Decision-Records-2e7dabadc8df8108894ff993a328b377"]]),
-        w("p1w3",3,
-          [["Padrões de Disponibilidade: circuit breaker, retry, bulkhead, timeout","https://azure.microsoft.com/en-us/resources/designing-distributed-systems/"],
-           ["CAP theorem e trade-offs",N+"CAP-theorem-e-trade-offs-2e7dabadc8df8138adcaf6f3ff5cfd3a"]],
-          [["PersistentVolumes, PersistentVolumeClaims, StorageClasses",N+"PersistentVolumes-PersistentVolumeClaims-StorageClasses-2e7dabadc8df81f7b367e753f3fc992a"],
-           ["Prática: Deploy de banco de dados stateful",N+"Pr-tica-Deploy-de-banco-de-dados-stateful-2e7dabadc8df8119a628e936ac6adfb1"]],
+          [["SRE Book cap. 3–4: SLOs, SLIs, SLAs — como definir o que importa","https://sre.google/sre-book/service-level-objectives/"]],
+          [["Team Topologies cap. 3–4: Stream-aligned, Platform, Enabling teams","https://teamtopologies.com/book"]]),
+        w("m1w3",3,
+          [["Padrões de Disponibilidade: circuit breaker, retry, bulkhead, timeout","https://azure.microsoft.com/en-us/resources/designing-distributed-systems/"]],
+          [["ConfigMap, Secrets, Environment variables, volumes básicos","https://kubernetes.io/docs/concepts/configuration/"]],
           [["VPC deep dive: subnets, route tables, security groups, NACLs","https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"]],
-          [["SRE Book cap. 5: Eliminating Toil — identifique toil no seu trabalho","https://sre.google/sre-book/eliminating-toil/"],
-           ["Observability vs Monitoring",N+"Observability-vs-Monitoring-2e7dabadc8df81df8230eb0f22a7ba39"]],
-          [["O que é um ADR + escreva o primeiro sobre uma decisão real","https://github.com/joelparkerhenderson/architecture-decision-record"],
-           ["Prática: Escrever ADR para decisão real",N+"Pr-tica-Escrever-ADR-para-decis-o-real-2e7dabadc8df812589f1ed7f2d0214c4"]]),
-        w("p1w4",4,
+          [["SRE Book cap. 5: Eliminating Toil — identifique toil no seu trabalho","https://sre.google/sre-book/eliminating-toil/"]],
+          [["O que é um ADR + escreva o primeiro sobre uma decisão real","https://github.com/joelparkerhenderson/architecture-decision-record"]]),
+        w("m1w4",4,
           [["Padrão Sidecar e Ambassador no contexto real (Istio, Vault Agent)","https://azure.microsoft.com/en-us/resources/designing-distributed-systems/"]],
-          [["Ingress Controllers (NGINX, Traefik)",N+"Ingress-Controllers-NGINX-Traefik-2e7dabadc8df81438f27fdd662617ad8"],
-           ["Network Policies em profundidade",N+"Network-Policies-em-profundidade-2e7dabadc8df8140855be3b1d5f73d9a"]],
+          [["Namespaces, Labels, Selectors, Annotations — organização real","https://kubernetes.io/docs/concepts/overview/"]],
           [["Vault production hardening: unsealing, audit, policies, leases","https://developer.hashicorp.com/vault/tutorials/operations/production-hardening"]],
-          [["SRE Book cap. 6: Monitoring Distributed Systems — 4 golden signals","https://sre.google/sre-book/monitoring-distributed-systems/"],
-           ["Pilares: Logs, Metrics, Traces",N+"Pilares-Logs-Metrics-Traces-2e7dabadc8df81c69918dc9ef4f47f3a"]],
-          [["Team Topologies cap. 5–6: Interaction modes, Team cognitive load","https://teamtopologies.com/book"],
-           ["RFC process",N+"RFC-process-2e7dabadc8df8145a1bace7e4bed84c2"]]),
+          [["SRE Book cap. 6: Monitoring Distributed Systems — 4 golden signals","https://sre.google/sre-book/monitoring-distributed-systems/"]],
+          [["Team Topologies cap. 5–6: Interaction modes, Team cognitive load","https://teamtopologies.com/book"]]),
       ]},
       { title:"Mês 2", weeks:[
-        w("p1w5",5,
-          [["Sharding, Consistent Hashing, particionamento de dados","https://github.com/donnemartin/system-design-primer"],
-           ["Scalability patterns",N+"Scalability-patterns-2e7dabadc8df8133b438ec2347fc9410"]],
-          [["Prática: Implementar políticas de rede isolando namespaces",N+"Pr-tica-Implementar-pol-ticas-de-rede-isolando-namespaces-2e7dabadc8df81b389e1c9d5eab7bf11"],
-           ["Service Mesh introdução (conceitos)",N+"Service-Mesh-introdu-o-conceitos-2e7dabadc8df81cfa763e827a2a7867d"]],
-          [["EKS deep dive: node groups, managed nodes, Fargate, IRSA","https://aws.github.io/aws-eks-best-practices/"],
-           ["EKS architecture e networking",N+"EKS-architecture-e-networking-2e7dabadc8df81adbb6bc5be988f748b"]],
-          [["SRE Book cap. 7–8: Evolution of Automation, Release Engineering","https://sre.google/sre-book/table-of-contents/"],
-           ["Reliability e availability",N+"Reliability-e-availability-2e7dabadc8df813083ccfad00c5e74a2"]],
-          [["An Elegant Puzzle cap. 1–2: Organizations e Sizing teams","https://lethain.com/elegant-puzzle/"],
-           ["Storytelling técnico",N+"Storytelling-t-cnico-2e7dabadc8df81618605d72b067f1fe2"]]),
-        w("p1w6",6,
+        w("m2w1",5,
+          [["Sharding, Consistent Hashing, particionamento de dados","https://github.com/donnemartin/system-design-primer"]],
+          [["Scheduling: nodeSelector, nodeAffinity, podAntiAffinity","https://kubernetes.io/docs/concepts/scheduling-eviction/"]],
+          [["EKS deep dive: node groups, managed nodes, Fargate, IRSA","https://aws.github.io/aws-eks-best-practices/"]],
+          [["SRE Book cap. 7–8: Evolution of Automation, Release Engineering","https://sre.google/sre-book/table-of-contents/"]],
+          [["An Elegant Puzzle cap. 1–2: Organizations e Sizing teams","https://lethain.com/elegant-puzzle/"]]),
+        w("m2w2",6,
           [["Event-driven architecture: Kafka patterns, idempotência, ordering","https://azure.microsoft.com/en-us/resources/designing-distributed-systems/"]],
-          [["Pod Security Standards/Admission",N+"Pod-Security-Standards-Admission-2e7dabadc8df81269d0fcf361afc8f19"],
-           ["RBAC: Roles, ClusterRoles, ServiceAccounts",N+"RBAC-Roles-ClusterRoles-ServiceAccounts-2e7dabadc8df8114b131edbf095d6a5b"]],
+          [["Taints e Tolerations, PriorityClass, resource requests e limits","https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/"]],
           [["CNCF Security Whitepaper — visão geral de segurança cloud-native","https://github.com/cncf/tag-security"]],
-          [["SRE Book cap. 13–14: Emergency Response, Managing Incidents","https://sre.google/sre-book/managing-incidents/"],
-           ["Postmortems blameless",N+"Postmortems-blameless-2e7dabadc8df8127942afb3e566b2d33"]],
-          [["An Elegant Puzzle cap. 3: Tools to manage technical quality","https://lethain.com/elegant-puzzle/"],
-           ["Documentation best practices",N+"Documentation-best-practices-2e7dabadc8df81a980d6f74f00d5a557"]]),
-        w("p1w7",7,
-          [["Multi-region patterns: active-active vs active-passive, failover","https://aws.amazon.com/architecture/"],
-           ["Disaster recovery planning",N+"Disaster-recovery-planning-2e7dabadc8df81dbaf4dd2235fc84808"]],
-          [["Prática: Configurar RBAC para múltiplos times",N+"Pr-tica-Configurar-RBAC-para-m-ltiplos-times-2e7dabadc8df81b09ba5d3001203e635"],
-           ["Secrets management básico",N+"Secrets-management-b-sico-2e7dabadc8df8171ab45f430e901983a"]],
+          [["SRE Book cap. 13–14: Emergency Response, Managing Incidents","https://sre.google/sre-book/managing-incidents/"]],
+          [["An Elegant Puzzle cap. 3: Tools to manage technical quality","https://lethain.com/elegant-puzzle/"]]),
+        w("m2w3",7,
+          [["Multi-region patterns: active-active vs active-passive, failover","https://aws.amazon.com/architecture/"]],
+          [["Services: ClusterIP, NodePort, LoadBalancer, Headless, ExternalName","https://kubernetes.io/docs/concepts/services-networking/service/"]],
           [["Pod Security Standards, RBAC no K8s, ServiceAccounts","https://kubernetes.io/docs/concepts/security/"]],
-          [["SRE Book cap. 15: Postmortem Culture — escreva um postmortem real","https://sre.google/sre-book/postmortem-culture/"],
-           ["Prática: Facilitar postmortem",N+"Pr-tica-Facilitar-postmortem-2e7dabadc8df81349207e5ec2386300b"]],
-          [["StaffEng: leia 2 histórias de Staff Engineers — anote padrões comuns","https://staffeng.com/stories/"],
-           ["Pair programming efetivo",N+"Pair-programming-efetivo-2e7dabadc8df819799acd15a975cd45b"]]),
-        w("p1w8",8,
-          [["Exercício: documente a arquitetura do cluster atual — identifique SPOFs",""]],
-          [["Logs e eventos do cluster",N+"Logs-e-eventos-do-cluster-2e7dabadc8df81a28211db33a690d107"],
-           ["Debugging pods, nodes, networking",N+"Debugging-pods-nodes-networking-2e7dabadc8df814e9480d4da05be9bd4"]],
+          [["SRE Book cap. 15: Postmortem Culture — escreva um postmortem real","https://sre.google/sre-book/postmortem-culture/"]],
+          [["StaffEng: leia 2 histórias de Staff Engineers — anote padrões comuns","https://staffeng.com/stories/"]]),
+        w("m2w4",8,
+          [["Exercício: documente a arquitetura do cluster actual — identifique SPOFs",""]],
+          [["DNS interno, CoreDNS, Ingress, NetworkPolicy básico","https://kubernetes.io/docs/concepts/services-networking/ingress/"]],
           [["Terraform avançado: módulos, workspaces, state locking, remote backends","https://developer.hashicorp.com/terraform/docs"]],
-          [["SRE Workbook cap. 2: SLOs in Practice — defina SLOs para 1 serviço real","https://sre.google/workbook/implementing-slos/"],
-           ["Prática: Desenhar sistema distribuído básico",N+"Pr-tica-Desenhar-sistema-distribu-do-b-sico-2e7dabadc8df81e3bc0fdc92fc7984d6"]],
-          [["Output: escreva um RFC de 1 página sobre uma melhoria técnica real","https://lethain.com/rfcs-and-design-documents/"],
-           ["Visualização de arquiteturas",N+"Visualiza-o-de-arquiteturas-2e7dabadc8df81c5ac87fdb5367ddcf7"]]),
+          [["SRE Workbook cap. 2: SLOs in Practice — defina SLOs para 1 serviço real","https://sre.google/workbook/implementing-slos/"]],
+          [["Output: escreva um RFC de 1 página sobre uma melhoria técnica real","https://lethain.com/rfcs-and-design-documents/"]]),
       ]},
       { title:"Mês 3", weeks:[
-        w("p1w9",9,
-          [["API Design: REST vs gRPC vs GraphQL — trade-offs reais","https://cloud.google.com/apis/design"],
-           ["Multi-tenancy strategies",N+"Multi-tenancy-strategies-2e7dabadc8df816596a4dc9481adafd7"]],
-          [["Prática: Simular e resolver falhas comuns",N+"Pr-tica-Simular-e-resolver-falhas-comuns-2e7dabadc8df8133b953f38b2597152e"],
-           ["Cluster maintenance (drain, cordon, upgrades)",N+"Cluster-maintenance-drain-cordon-upgrades-2e7dabadc8df81038b24eeb7a6a51339"]],
-          [["ArgoCD security: RBAC, SSO, secret management, webhook validation","https://argo-cd.readthedocs.io/en/stable/operator-manual/security/"],
-           ["GuardDuty, Security Hub",N+"GuardDuty-Security-Hub-2e7dabadc8df81df9828f199ec33deac"]],
-          [["Alerting philosophy: alertar em sintomas vs causas, alerta acionável","https://docs.google.com/document/d/199PqyG3UsyXlwieHaqbGiWVa8eMWi8zzAn0YfcApr8Q"],
-           ["Chaos engineering basics",N+"Chaos-engineering-basics-2e7dabadc8df817bb13bd865972dfca2"]],
-          [["An Elegant Puzzle cap. 4–5: Migrations e Staying aligned with authority","https://lethain.com/elegant-puzzle/"],
-           ["Como dar feedback construtivo",N+"Como-dar-feedback-construtivo-2e7dabadc8df81ed8c3ad0a2b9e4f1c6"]]),
-        w("p1w10",10,
-          [["Data pipelines: batch vs streaming, backpressure, exactly-once delivery","https://github.com/donnemartin/system-design-primer"],
-           ["Data replication strategies",N+"Data-replication-strategies-2e7dabadc8df816eb874f08840905ab5"]],
-          [["Cluster upgrades com kubeadm",N+"Cluster-upgrades-com-kubeadm-2e7dabadc8df815bbc2cd0733ffd12fc"],
-           ["ETCD backup e restore",N+"ETCD-backup-e-restore-2e7dabadc8df81da98abc18f01169b44"]],
-          [["SOPS + age/PGP: boas práticas de gestão de secrets em GitOps","https://github.com/getsops/sops"],
-           ["AWS Organizations e SCPs",N+"AWS-Organizations-e-SCPs-2e7dabadc8df81508e8cf822f6ad5f5f"]],
-          [["Observability Engineering cap. 1–3: de métricas para eventos estruturados","https://www.oreilly.com/library/view/observability-engineering/9781492076438/"],
-           ["PromQL básico e intermediário",N+"PromQL-b-sico-e-intermedi-rio-2e7dabadc8df81758021fddc773c5b45"]],
-          [["Staff archetypes: qual é o seu? (Tech Lead, Architect, Solver, Right Hand)","https://staffeng.com/guides/staff-archetypes/"],
-           ["Code review como ensino",N+"Code-review-como-ensino-2e7dabadc8df816fa950ef016aaee9c3"]]),
-        w("p1w11",11,
+        w("m3w1",9,
+          [["API Design: REST vs gRPC vs GraphQL — trade-offs reais","https://cloud.google.com/apis/design"]],
+          [["Storage: PV, PVC, StorageClass, dynamic provisioning, access modes","https://kubernetes.io/docs/concepts/storage/"]],
+          [["ArgoCD security: RBAC, SSO, secret management, webhook validation","https://argo-cd.readthedocs.io/en/stable/operator-manual/security/"]],
+          [["Alerting philosophy: alertar em sintomas vs causas, alerta acionável","https://docs.google.com/document/d/199PqyG3UsyXlwieHaqbGiWVa8eMWi8zzAn0YfcApr8Q"]],
+          [["An Elegant Puzzle cap. 4–5: Migrations e Staying aligned with authority","https://lethain.com/elegant-puzzle/"]]),
+        w("m3w2",10,
+          [["Data pipelines: batch vs streaming, backpressure, exactly-once delivery","https://github.com/donnemartin/system-design-primer"]],
+          [["RBAC completo: Role, ClusterRole, Bindings, aggregation, audit","https://kubernetes.io/docs/reference/access-authn-authz/rbac/"]],
+          [["SOPS + age/PGP: boas práticas de gestão de secrets em GitOps","https://github.com/getsops/sops"]],
+          [["Observability Engineering cap. 1–3: de métricas para eventos estruturados","https://www.oreilly.com/library/view/observability-engineering/9781492076438/"]],
+          [["Staff archetypes: qual é o seu? (Tech Lead, Architect, Solver, Right Hand)","https://staffeng.com/guides/staff-archetypes/"]]),
+        w("m3w3",11,
           [["Service Mesh deep: Istio traffic management, mTLS, observability","https://istio.io/latest/docs/concepts/"]],
-          [["Prática: Backup/restore completo, upgrade de cluster",N+"Pr-tica-Backup-restore-completo-upgrade-de-cluster-2e7dabadc8df81958a4bdbdef23485d2"],
-           ["Certificados e componentes do control plane",N+"Certificados-e-componentes-do-control-plane-2e7dabadc8df811b88a4fdecd812b3ba"]],
-          [["AWS Security Hub, GuardDuty, Config Rules — detecção e compliance","https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"],
-           ["IAM Identity Center",N+"IAM-Identity-Center-2e7dabadc8df817b871fdbf345f9434f"]],
-          [["Dynatrace DQL avançado — baseado no uso atual com asg_metrics Lambda","https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language"],
-           ["Arquitetura e data model Prometheus",N+"Arquitetura-e-data-model-Prometheus-2e7dabadc8df81d39689f6a5ba5ca231"]],
-          [["Como dar feedback técnico em code review que ensina, não apenas corrige","https://newsletter.pragmaticengineer.com/p/code-review"],
-           ["Prática: Mentorar colega em tópico específico",N+"Pr-tica-Mentorar-colega-em-t-pico-espec-fico-2e7dabadc8df81c7afa4d7cd1b5cca0e"]]),
-        w("p1w12",12,
+          [["Cluster Administration: certificates, kubeconfig, users, upgrade de cluster","https://kubernetes.io/docs/tasks/administer-cluster/"]],
+          [["AWS Security Hub, GuardDuty, Config Rules — detecção e compliance","https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"]],
+          [["Dynatrace DQL avançado — baseado no uso actual com asg_metrics Lambda","https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language"]],
+          [["Como dar feedback técnico em code review que ensina, não apenas corrige","https://newsletter.pragmaticengineer.com/p/code-review"]]),
+        w("m3w4",12,
           [["Exercício: redesenhe o fluxo de auth do Vault K8s Auth — onde estão os SPOFs?",""]],
-          [["Revisão de pontos fracos",N+"Revis-o-de-pontos-fracos-2e7dabadc8df814a91d3c4ace27d22e0"]],
+          [["Troubleshooting: CrashLoopBackOff, Pending, OOMKilled, network issues","https://kubernetes.io/docs/tasks/debug/"]],
           [["Supply chain security: SLSA, Sigstore, container image signing","https://slsa.dev/"]],
-          [["Exercício: defina SLOs para o Vault cluster — quais SLIs fazem sentido?",""],
-           ["ServiceMonitors e PodMonitors",N+"ServiceMonitors-e-PodMonitors-2e7dabadc8df8107b6c0d3f99a162e9e"]],
-          [["Output: ADR real para decisão técnica do mês — compartilhe internamente","https://github.com/joelparkerhenderson/architecture-decision-record"],
-           ["Technical proposals",N+"Technical-proposals-2e7dabadc8df811fa720c19e855ac781"]]),
+          [["Exercício: defina SLOs para o Vault cluster — quais SLIs fazem sentido?",""]],
+          [["Output: ADR real para decisão técnica do mês — compartilhe internamente","https://github.com/joelparkerhenderson/architecture-decision-record"]]),
       ]},
       { title:"Mês 4 — CKA Sprint", weeks:[
-        w("p1w13",13,
+        w("m4w1",13,
           [["Revisitar System Design Primer — áreas fracas identificadas","https://github.com/donnemartin/system-design-primer"]],
-          [["Killer.sh mock exams — 1ª rodada",N+"Killer-sh-mock-exams-2e7dabadc8df817bafabd1f3618abc51"]],
-          [["AWS Well-Architected: Reliability Pillar completo","https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"],
-           ["Prática: Security baseline completo",N+"Pr-tica-Security-baseline-completo-2e7dabadc8df81338b31d3b0842a7f30"]],
-          [["SRE Workbook cap. 3–4: Error Budgets na prática","https://sre.google/workbook/error-budget-policy/"],
-           ["Recording rules e alerting rules",N+"Recording-rules-e-alerting-rules-2e7dabadc8df81a69416cc225a13e952"]],
-          [["Reler e melhorar os ADRs e RFC escritos nas semanas anteriores",""],
-           ["Estimativas técnicas",N+"Estimativas-t-cnicas-2e7dabadc8df81a38b2ed92ba5fafb72"]]),
-        w("p1w14",14,
+          [["🎯 Mock exam 1 no killer.sh — anote pontos fracos","https://killer.sh/"]],
+          [["AWS Well-Architected: Reliability Pillar completo","https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"]],
+          [["SRE Workbook cap. 3–4: Error Budgets na prática","https://sre.google/workbook/error-budget-policy/"]],
+          [["Reler e melhorar os ADRs e RFC escritos nas semanas anteriores",""]]),
+        w("m4w2",14,
           [["Revisão de pontos fracos em System Design","https://github.com/donnemartin/system-design-primer"]],
-          [["Revisão de pontos fracos identificados no mock",N+"Revis-o-de-pontos-fracos-2e7dabadc8df814a91d3c4ace27d22e0"]],
-          [["Revisar: Vault, SOPS, ArgoCD security configs do ambiente real",""],
-           ["Transit Gateway e VPC patterns",N+"Transit-Gateway-e-VPC-patterns-2e7dabadc8df8175930df53b92efe5fe"]],
-          [["Postmortem formal de um incidente real do trabalho","https://sre.google/sre-book/postmortem-culture/"],
-           ["Prática: Setup Prometheus stack no K8s",N+"Pr-tica-Setup-Prometheus-stack-no-K8s-2e7dabadc8df8193929cc835dd9425d6"]],
-          [["Will Larson blog: leia 2 posts sobre Staff Engineering","https://lethain.com/"],
-           ["Risk assessment",N+"Risk-assessment-2e7dabadc8df816fb8c3db7329f57ae3"]]),
-        w("p1w15",15,
+          [["Revisão dos pontos fracos do mock + exercícios focados","https://kubernetes.io/docs/"]],
+          [["Revisar: Vault, SOPS, ArgoCD security configs do ambiente real",""]],
+          [["Postmortem formal de um incidente real do trabalho","https://sre.google/sre-book/postmortem-culture/"]],
+          [["Will Larson blog: leia 2 posts sobre Staff Engineering","https://lethain.com/"]]),
+        w("m4w3",15,
           [["Revisão final de System Design — prepare 3 designs do zero","https://github.com/donnemartin/system-design-primer"]],
-          [["Killer.sh mock exams — 2ª rodada",N+"Killer-sh-mock-exams-2e7dabadc8df817bafabd1f3618abc51"]],
-          [["Revisar EKS best practices aplicadas ao ambiente atual","https://aws.github.io/aws-eks-best-practices/"],
-           ["PrivateLink para serviços",N+"PrivateLink-para-servi-os-2e7dabadc8df813b9ff8ff3498bf526c"]],
-          [["Criar dashboard de SLOs para 1 serviço real que você opera",""],
-           ["Prática: Alertas customizados e dashboards",N+"Pr-tica-Alertas-customizados-e-dashboards-2e7dabadc8df8151a78cd31931b3f35f"]],
-          [["Prepare apresentação de uma decisão técnica para o time",""],
-           ["Prática: Preparar talk de 15 min",N+"Pr-tica-Preparar-talk-de-15-min-2e7dabadc8df813c945bcf2ab6d813b8"]]),
-        w("p1w16",16,
+          [["🎯 Mock exam 2 no killer.sh — medir evolução","https://killer.sh/"]],
+          [["Revisar EKS best practices aplicadas ao ambiente actual","https://aws.github.io/aws-eks-best-practices/"]],
+          [["Criar dashboard de SLOs para 1 serviço real que você opera",""]],
+          [["Prepare apresentação de uma decisão técnica para o time",""]]),
+        w("m4w4",16,
           [["Descanso mental — revisão leve de conceitos-chave",""]],
-          [["🏆 REALIZAR EXAME CKA",N+"REALIZAR-EXAME-CKA-2e7dabadc8df811b9b7bc1a96512a014"]],
+          [["🏆 CKA — Fazer o exame!","https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/"]],
           [["Revisão pós-exame: lacunas identificadas",""]],
           [["Revisão do roadmap — o que mudou, o que ajustar",""]],
           [["Retrospectiva da Fase 1 — escreva 3 aprendizados principais",""]]),
       ]},
     ]
   },
-  // ── FASE 2 ── GitOps/ArgoCD (Meses 5–6, Semanas 17–24) ───────────────────
+
+  // ─── FASE 2 — Consolidação (Meses 5–6) ───────────────────────────────────
   {
-    id:"p2",num:2,title:"Consolidação",period:"Meses 5–6",cert:"→ CKAD prep iniciado",
+    id:"p2", num:2, title:"Consolidação", period:"Meses 5–6", weeks_label:"Semanas 17–24",
+    cert:"→ CKAD prep iniciado",
     goal:"CKA conquistado. GitOps avançado. Ampliar visão de Staff. Ser referência técnica visível.",
     months:[
       { title:"Mês 5", weeks:[
-        w("p2w1",17,
+        w("m5w1",17,
           [["Software Architecture: The Hard Parts cap. 1–2: decomposição e acoplamento","https://www.oreilly.com/library/view/software-architecture-the/9781492086888/"]],
-          [["Princípios GitOps (declarativo, versionado, automatizado)",N+"Princ-pios-GitOps-declarativo-versionado-automatizado-2e7dabadc8df81c386d7ecb529685ea3"],
-           ["Comparação: Push vs Pull-based deployments",N+"Compara-o-Push-vs-Pull-based-deployments-2e7dabadc8df81488e29d4e67731c639"]],
-          [["EKS advanced: Karpenter, cluster autoscaler, spot instances","https://aws.github.io/aws-eks-best-practices/"],
-           ["EKS + Karpenter",N+"EKS-Karpenter-2e7dabadc8df812f8cc0d0ee2d688614"]],
-          [["Observability Engineering cap. 4–5: instrumentação e structured events","https://www.oreilly.com/library/view/observability-engineering/9781492076438/"],
-           ["Dashboard design best practices",N+"Dashboard-design-best-practices-2e7dabadc8df81468593e7915b897a94"]],
-          [["The Staff Engineer's Path cap. 1–2: o que Staff significa","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"],
-           ["O que é uma Internal Developer Platform",N+"O-que-uma-Internal-Developer-Platform-2e7dabadc8df81e1bc73ec53fff61f2a"]]),
-        w("p2w2",18,
+          [["ArgoCD ApplicationSets: generators (cluster, git, matrix)","https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/"]],
+          [["EKS advanced: Karpenter, cluster autoscaler, spot instances","https://aws.github.io/aws-eks-best-practices/"]],
+          [["Observability Engineering cap. 4–5: instrumentação e structured events","https://www.oreilly.com/library/view/observability-engineering/9781492076438/"]],
+          [["The Staff Engineer's Path cap. 1–2: o que Staff significa","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"]]),
+        w("m5w2",18,
           [["Software Architecture: The Hard Parts cap. 3–4: granularidade e contratos","https://www.oreilly.com/library/view/software-architecture-the/9781492086888/"]],
-          [["Prática: Setup inicial ArgoCD em cluster local",N+"Pr-tica-Setup-inicial-ArgoCD-em-cluster-local-2e7dabadc8df81ccb155e303882f1ec9"],
-           ["Sync policies e health checks",N+"Sync-policies-e-health-checks-2e7dabadc8df81a38f3ee424b9226739"]],
-          [["FinOps básico: right-sizing, Reserved vs Spot, Cost Explorer","https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"],
-           ["Cloud cost optimization",N+"Cloud-cost-optimization-2e7dabadc8df81b39d86ee9110ba88c8"]],
-          [["Observability Engineering cap. 6–7: tracing distribuído, high-cardinality","https://www.oreilly.com/library/view/observability-engineering/9781492076438/"],
-           ["Variables, annotations, alerting (Grafana)",N+"Variables-annotations-alerting-2e7dabadc8df81aab792ea07535921d9"]],
-          [["The Staff Engineer's Path cap. 3: big-picture thinking","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"],
-           ["Platform as a Product mindset",N+"Platform-as-a-Product-mindset-2e7dabadc8df814f9740c90b4810fa31"]]),
-        w("p2w3",19,
+          [["ArgoCD Sync Waves, Hooks (PreSync, Sync, PostSync, SyncFail)","https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/"]],
+          [["FinOps básico: right-sizing, Reserved vs Spot, Cost Explorer","https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"]],
+          [["Observability Engineering cap. 6–7: tracing distribuído, high-cardinality","https://www.oreilly.com/library/view/observability-engineering/9781492076438/"]],
+          [["The Staff Engineer's Path cap. 3: big-picture thinking","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"]]),
+        w("m5w3",19,
           [["Software Architecture: The Hard Parts cap. 5–6: workflows distribuídos","https://www.oreilly.com/library/view/software-architecture-the/9781492086888/"]],
-          [["Applications, Projects, ApplicationSets",N+"Applications-Projects-ApplicationSets-2e7dabadc8df818dba51c894d699c5fd"],
-           ["Prática: Deploy multi-ambiente com ArgoCD",N+"Pr-tica-Deploy-multi-ambiente-com-ArgoCD-2e7dabadc8df81119899f7fb7fd7c425"]],
-          [["ArgoCD best practices: repo structure, secrets, RBAC produção","https://argo-cd.readthedocs.io/en/stable/user-guide/best_practices/"],
-           ["SSO e RBAC no ArgoCD",N+"SSO-e-RBAC-no-ArgoCD-2e7dabadc8df812fa455f975d8ed1ab5"]],
-          [["OpenTelemetry: spec, SDK, collector, exporters — instrumentar 1 serviço","https://opentelemetry.io/docs/"],
-           ["OpenTelemetry overview",N+"OpenTelemetry-overview-2e7dabadc8df817496c6e2670ba95831"]],
-          [["The Staff Engineer's Path cap. 4–5: execução e comunicação","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"],
-           ["Developer Experience (DevEx)",N+"Developer-Experience-DevEx-2e7dabadc8df81198e41e152013d682f"]]),
-        w("p2w4",20,
+          [["Helm avançado: library charts, sub-charts, values inheritance","https://helm.sh/docs/topics/advanced/"]],
+          [["ArgoCD best practices: repo structure, secrets, RBAC produção","https://argo-cd.readthedocs.io/en/stable/user-guide/best_practices/"]],
+          [["OpenTelemetry: spec, SDK, collector, exporters — instrumentar 1 serviço","https://opentelemetry.io/docs/"]],
+          [["The Staff Engineer's Path cap. 4–5: execução e comunicação","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"]]),
+        w("m5w4",20,
           [["Software Architecture: The Hard Parts cap. 7–8: sagas e transações","https://www.oreilly.com/library/view/software-architecture-the/9781492086888/"]],
-          [["Multi-cluster management",N+"Multi-cluster-management-2e7dabadc8df81a8910dd70112ae1451"],
-           ["Hooks e Sync Waves",N+"Hooks-e-Sync-Waves-2e7dabadc8df8124bc5ac7579c4e2d0c"]],
-          [["Istio avançado: traffic management, canary, circuit breaking","https://istio.io/latest/docs/concepts/traffic-management/"],
-           ["Traffic management (Istio)",N+"Traffic-management-2e7dabadc8df81a5a845f29074b55b12"]],
-          [["OpenTelemetry: correlacionar traces com métricas e logs","https://opentelemetry.io/docs/"],
-           ["Conceitos: spans, traces, context propagation",N+"Conceitos-spans-traces-context-propagation-2e7dabadc8df81689a78eb188dfbcce2"]],
-          [["The Staff Engineer's Path cap. 6: impacto de longo prazo","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"],
-           ["Building consensus",N+"Building-consensus-2e7dabadc8df81139f0bcb5e2a4ec809"]]),
+          [["OPA/Conftest: escrever policies em Rego, testar, integrar no CI","https://www.conftest.dev/"]],
+          [["Istio avançado: traffic management, canary, circuit breaking","https://istio.io/latest/docs/concepts/traffic-management/"]],
+          [["OpenTelemetry: correlacionar traces com métricas e logs","https://opentelemetry.io/docs/"]],
+          [["The Staff Engineer's Path cap. 6: impacto de longo prazo","https://www.oreilly.com/library/view/the-staff-engineers/9781098118723/"]]),
       ]},
       { title:"Mês 6", weeks:[
-        w("p2w5",21,
+        w("m6w1",21,
           [["Revisão: qual trade-off arquitetural mais se aplica ao seu ambiente?",""]],
-          [["Helm avançado: library charts, sub-charts, values inheritance","https://helm.sh/docs/topics/advanced/"],
-           ["Chart development best practices",N+"Chart-development-best-practices-2e7dabadc8df81a1b437e6535bc4ec5a"]],
-          [["External Secrets Operator: configuração e boas práticas com Vault","https://external-secrets.io/latest/"],
-           ["Vault + External Secrets Operator",N+"Vault-External-Secrets-Operator-2e7dabadc8df8110a2a3e5ee80845d0c"]],
-          [["Definir SLOs para 2 serviços adicionais — dashboard unificado",""],
-           ["Prática: Dashboard completo para aplicação",N+"Pr-tica-Dashboard-completo-para-aplica-o-2e7dabadc8df81b4a98fe1ee29dc955a"]],
-          [["Escreva 1 post técnico interno sobre algo que você resolveu",""],
-           ["Escrever blog post técnico",N+"Escrever-blog-post-t-cnico-2e7dabadc8df815b98f0e5210595fc7a"]]),
-        w("p2w6",22,
+          [["Kubechecks: setup e integração com GitHub + ArgoCD","https://github.com/zapier/kubechecks"]],
+          [["External Secrets Operator: configuração e boas práticas com Vault","https://external-secrets.io/latest/"]],
+          [["Definir SLOs para 2 serviços adicionais — dashboard unificado",""]],
+          [["Escreva 1 post técnico interno sobre algo que você resolveu",""]]),
+        w("m6w2",22,
           [["Platform Engineering on Kubernetes cap. 1–4: IDPs e developer workflows","https://www.manning.com/books/platform-engineering-on-kubernetes"]],
-          [["OPA/Conftest: escrever policies em Rego, testar, integrar no CI","https://www.conftest.dev/"],
-           ["Config Management Plugins (ArgoCD)",N+"Config-Management-Plugins-2e7dabadc8df8145903fd7ce383421f9"]],
-          [["Backstage intro: software catalog, plugin architecture, techdocs","https://backstage.io/docs"],
-           ["Arquitetura do Backstage",N+"Arquitetura-do-Backstage-2e7dabadc8df813ca137d3cee82b4e0b"]],
+          [["Backstage intro: software catalog, plugin architecture, techdocs","https://backstage.io/docs"]],
           [["Chaos Engineering: princípios, Game Days — proponha 1 internamente","https://principledchaos.org/"]],
-          [["Apresente 1 decisão técnica para stakeholders além do squad",""],
-           ["Stakeholder management",N+"Stakeholder-management-2e7dabadc8df81cc82b7c2a5c2eb2e3b"]]),
-        w("p2w7",23,
+          [["DORA Metrics: calcule deployment frequency e MTTR do squad","https://dora.dev/research/"]],
+          [["Apresente 1 decisão técnica para stakeholders além do squad",""]]),
+        w("m6w3",23,
           [["Platform Engineering on Kubernetes cap. 5–7: service pipelines, self-service","https://www.manning.com/books/platform-engineering-on-kubernetes"]],
-          [["Crossplane introduction",N+"Crossplane-introduction-2e7dabadc8df81de8d89e2326c13db90"],
-           ["Compositions e XRDs",N+"Compositions-e-XRDs-2e7dabadc8df8136aec8c48b9be58b2d"]],
-          [["RFC formal: Kubechecks + OPA rollout para o squad","https://lethain.com/rfcs-and-design-documents/"],
-           ["Prática: Pipeline de promoção entre ambientes",N+"Pr-tica-Pipeline-de-promo-o-entre-ambientes-2e7dabadc8df810abc6ceec83b1da8fe"]],
-          [["DORA Metrics: calcule deployment frequency e MTTR do squad","https://dora.dev/research/"],
-           ["Arquiteturas: ELK vs Loki vs outros",N+"Arquiteturas-ELK-vs-Loki-vs-outros-2e7dabadc8df810d89f7db1274f93890"]],
-          [["Output: documente a plataforma atual como IDP — o que falta?",""],
-           ["Prática: Propor mudança técnica significativa",N+"Pr-tica-Propor-mudan-a-t-cnica-significativa-2e7dabadc8df81289cb8ec81cea51a57"]]),
-        w("p2w8",24,
+          [["Crossplane intro: composições, XRDs, AWS provider em lab","https://docs.crossplane.io/"]],
+          [["RFC formal: Kubechecks + OPA rollout para o squad","https://lethain.com/rfcs-and-design-documents/"]],
+          [["Leia 2 posts de Staff Engineers sobre influência organizacional","https://staffeng.com/"]],
+          [["Output: documente a plataforma actual como IDP — o que falta?",""]]),
+        w("m6w4",24,
           [["Retrospectiva técnica: revise todos os ADRs/RFCs escritos até agora",""]],
-          [["Comparação ArgoCD vs Flux",N+"Compara-o-ArgoCD-vs-Flux-2e7dabadc8df816183a9d36503b411a8"],
-           ["Arquitetura Flux (Source, Kustomize, Helm controllers)",N+"Arquitetura-Flux-Source-Kustomize-Helm-controllers-2e7dabadc8df811189b0f69119cf15e3"]],
-          [["Revisar postura de segurança atual: gaps identificados",""]],
-          [["Apresente métricas DORA calculadas para o time com recomendações","https://dora.dev/quickcheck/"],
-           ["Loki: arquitetura e LogQL",N+"Loki-arquitetura-e-LogQL-2e7dabadc8df81a98cbae6b8ccbb938a"]],
-          [["Retrospectiva da Fase 2 — 3 aprendizados + ajuste no roadmap",""],
-           ["Networking com comunidade",N+"Networking-com-comunidade-2e7dabadc8df81f299f1e6b44d8139f7"]]),
+          [["Revisar ArgoCD multi-cluster e GitOps patterns avançados","https://argo-cd.readthedocs.io/"]],
+          [["Revisar postura de segurança actual: gaps identificados",""]],
+          [["Apresente métricas DORA calculadas para o time com recomendações","https://dora.dev/quickcheck/"]],
+          [["Retrospectiva da Fase 2 — 3 aprendizados + ajuste no roadmap",""]]),
       ]},
     ]
   },
-  // ── FASE 3 ── CKAD + Observabilidade (Meses 7–10, Semanas 25–40) ──────────
+
+  // ─── FASE 3 — Expansão (Meses 7–10) ──────────────────────────────────────
   {
-    id:"p3",num:3,title:"Expansão",period:"Meses 7–10",cert:"🎓 CKAD — Meta: Semana 38",
+    id:"p3", num:3, title:"Expansão", period:"Meses 7–10", weeks_label:"Semanas 25–40",
+    cert:"🎓 CKAD — Meta: Mês 10",
     goal:"CKAD. Observabilidade madura. Impacto fora do squad. Output de conhecimento público.",
     months:[
       { title:"Mês 7", weeks:[
-        w("p3w1",25,
+        w("m7w1",25,
           [["Production Kubernetes cap. 1–3: cluster design decisions e trade-offs","https://www.oreilly.com/library/view/production-kubernetes/9781492092292/"]],
-          [["Init containers",N+"Init-containers-2e7dabadc8df81dfbf8fd6b9e18a4603"],
-           ["Multi-container patterns (sidecar, ambassador, adapter)",N+"Multi-container-patterns-sidecar-ambassador-adapter-2e7dabadc8df819ab216c56307738aa8"]],
-          [["DevSecOps: shift-left security, SAST/DAST no CI, Trivy em pipelines","https://trivy.dev/"],
-           ["Container security scanning (Trivy)",N+"Container-security-scanning-Trivy-2e7dabadc8df8194b639c5a6913c535a"]],
-          [["Observability vs Monitoring",N+"Observability-vs-Monitoring-2e7dabadc8df81df8230eb0f22a7ba39"],
-           ["Pilares: Logs, Metrics, Traces",N+"Pilares-Logs-Metrics-Traces-2e7dabadc8df81c69918dc9ef4f47f3a"]],
-          [["Accelerate (livro) cap. 1–4: métricas DORA e o que elas significam","https://itrevolution.com/accelerate-book/"],
-           ["Participar de meetup/conferência",N+"Participar-de-meetup-confer-ncia-2e7dabadc8df819a8938ce2a3de83458"]]),
-        w("p3w2",26,
+          [["CKAD: Application Design — multi-container pods, init containers, sidecars","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["DevSecOps: shift-left security, SAST/DAST no CI, Trivy em pipelines","https://trivy.dev/"]],
+          [["Chaos Engineering: princípios e Game Days — execute 1 no ambiente qa","https://principledchaos.org/"]],
+          [["Accelerate (livro) cap. 1–4: métricas DORA e o que elas significam","https://itrevolution.com/accelerate-book/"]]),
+        w("m7w2",26,
           [["Production Kubernetes cap. 4–5: networking e storage em produção","https://www.oreilly.com/library/view/production-kubernetes/9781492092292/"]],
-          [["Blue/Green deployments",N+"Blue-Green-deployments-2e7dabadc8df81a69a4af0d6f0759bf9"],
-           ["Rolling updates, Recreate",N+"Rolling-updates-Recreate-2e7dabadc8df81d185ecd5b39c031ba3"]],
-          [["Falco para detecção de ameaças",N+"Falco-para-detec-o-de-amea-as-2e7dabadc8df8143a8d6c3e41756fc44"],
-           ["Container isolation e riscos",N+"Container-isolation-e-riscos-2e7dabadc8df81b3ac45f1d80a55a49c"]],
-          [["SLIs, SLOs, SLAs e Error Budgets (revisão profunda)",N+"SLIs-SLOs-SLAs-e-Error-Budgets-2e7dabadc8df811e9808c956e5981637"],
-           ["Arquitetura e data model Prometheus",N+"Arquitetura-e-data-model-Prometheus-2e7dabadc8df81d39689f6a5ba5ca231"]],
-          [["Accelerate cap. 5–8: transformational leadership e cultura","https://itrevolution.com/accelerate-book/"],
-           ["Identificar projeto open source para contribuir",N+"Identificar-projeto-open-source-para-contribuir-2e7dabadc8df81e0b811e545a0c137ef"]]),
-        w("p3w3",27,
-          [["Production Kubernetes cap. 6–7: segurança e multi-tenancy em produção","https://www.oreilly.com/library/view/production-kubernetes/9781492092292/"]],
-          [["Jobs e CronJobs",N+"Jobs-e-CronJobs-2e7dabadc8df81528ff5e219a8cfeed7"],
-           ["Prática: Implementar cada pattern",N+"Pr-tica-Implementar-cada-pattern-2e7dabadc8df81b3846fe8f28a7dbb32"]],
-          [["OPA Gatekeeper em produção: constraint templates, admission webhooks","https://open-policy-agent.github.io/gatekeeper/website/"],
-           ["OPA/Gatekeeper policies",N+"OPA-Gatekeeper-policies-2e7dabadc8df81e8a075f9ca56bf9741"]],
-          [["Federation e remote write (Prometheus)",N+"Federation-e-remote-write-2e7dabadc8df81b7940decbac5be423c"],
-           ["ServiceMonitors e PodMonitors",N+"ServiceMonitors-e-PodMonitors-2e7dabadc8df8107b6c0d3f99a162e9e"]],
-          [["Escreva post técnico externo (Medium/Substack) sobre problema resolvido",""],
-           ["Prática: Publicar artigo",N+"Pr-tica-Publicar-artigo-2e7dabadc8df819ea96de35ee7a46228"]]),
-        w("p3w4",28,
-          [["Production Kubernetes cap. 8–10: observabilidade, cost management","https://www.oreilly.com/library/view/production-kubernetes/9781492092292/"]],
-          [["Canary releases",N+"Canary-releases-2e7dabadc8df8140a580f0a5bb42881d"],
-           ["Prática: Implementar canary com ArgoCD Rollouts",N+"Pr-tica-Implementar-canary-com-ArgoCD-Rollouts-2e7dabadc8df815dae23fa0541cb3c10"]],
-          [["Exercício: redesenhe 1 componente da plataforma com foco em segurança",""]],
-          [["Prática: Setup Prometheus stack no K8s",N+"Pr-tica-Setup-Prometheus-stack-no-K8s-2e7dabadc8df8193929cc835dd9425d6"],
-           ["Recording rules e alerting rules",N+"Recording-rules-e-alerting-rules-2e7dabadc8df81a69416cc225a13e952"]],
-          [["Liderar 1 iniciativa cross-squad: plano formal com objetivos e métricas",""],
-           ["Project planning",N+"Project-planning-2e7dabadc8df81ac9e39c2f80110aeb5"]]),
+          [["CKAD: Configuration — ConfigMaps, Secrets, ResourceQuotas, LimitRanges","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Falco: runtime security, rules, alertas em tempo real","https://falco.org/docs/"]],
+          [["DORA Metrics: medir deployment frequency e lead time do squad","https://dora.dev/research/"]],
+          [["Accelerate cap. 5–8: transformational leadership e cultura","https://itrevolution.com/accelerate-book/"]]),
+        w("m7w3",27,
+          [["Service mesh observabilidade: Kiali, Jaeger, distributed tracing com Istio","https://istio.io/latest/docs/tasks/observability/"]],
+          [["CKAD: Pod design patterns avançados — ambassador, adapter, sidecar real","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Container runtime security: gVisor, Kata containers, RuntimeClass","https://kubernetes.io/docs/concepts/containers/runtime-class/"]],
+          [["Chaos + Istio: fault injection — delay e abort em rotas reais","https://istio.io/latest/docs/tasks/traffic-management/fault-injection/"]],
+          [["Accelerate cap. 9–11: technical practices — continuous delivery e qualidade","https://itrevolution.com/accelerate-book/"]]),
+        w("m7w4",28,
+          [["Exercício: redesenhe o sistema de CD da empresa do zero — SPOFs e melhorias",""]],
+          [["CKAD: StatefulSets, Headless services, volume snapshots e restore","https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/"]],
+          [["Image hardening: distroless, multi-stage builds, non-root containers","https://github.com/GoogleContainerTools/distroless"]],
+          [["SRE: toil audit — quantifique o toil actual e proponha 1 automação","https://sre.google/sre-book/eliminating-toil/"]],
+          [["Proposta de iniciativa cross-squad: identifique 1 problema + solução formal",""]]),
       ]},
       { title:"Mês 8", weeks:[
-        w("p3w5",29,
-          [["GitOps avançado: multi-cluster management, fleet management patterns","https://www.manning.com/books/gitops-and-kubernetes"],
-           ["Multi-cluster patterns",N+"Multi-cluster-patterns-2e7dabadc8df8105a6bcf32763bab350"]],
-          [["ConfigMaps e Secrets best practices",N+"ConfigMaps-e-Secrets-best-practices-2e7dabadc8df8166963ac40de2bf0a8c"],
-           ["Sealed Secrets",N+"Sealed-Secrets-2e7dabadc8df816085a1c082196fa548"]],
-          [["Supply chain: Sigstore, cosign, container image signing no pipeline","https://sigstore.dev/"],
-           ["Image signing e verification (Cosign, Notary)",N+"Image-signing-e-verification-Cosign-Notary-2e7dabadc8df8163a63ac28368e45d03"]],
-          [["Prática: Alertas customizados e dashboards",N+"Pr-tica-Alertas-customizados-e-dashboards-2e7dabadc8df8151a78cd31931b3f35f"],
-           ["Variables, annotations, alerting",N+"Variables-annotations-alerting-2e7dabadc8df81aab792ea07535921d9"]],
-          [["Mentorar: pair programming com eng. mais júnior",""],
-           ["Pair programming efetivo",N+"Pair-programming-efetivo-2e7dabadc8df819799acd15a975cd45b"]]),
-        w("p3w6",30,
-          [["Kustomize vs Helm: quando usar cada um",N+"Kustomize-vs-Helm-quando-usar-cada-um-2e7dabadc8df817e9db6fa5bffed725b"],
-           ["Overlays, patches, transformers",N+"Overlays-patches-transformers-2e7dabadc8df819e94ace55b0c8802b5"]],
-          [["External Secrets Operator (profundo)",N+"External-Secrets-Operator-2e7dabadc8df81dabddee86255812c86"],
-           ["Prática: Gestão segura de secrets em GitOps",N+"Pr-tica-Gest-o-segura-de-secrets-em-GitOps-2e7dabadc8df81c6b717c6ec0b113eb7"]],
-          [["Kubernetes network policies avançadas: Cilium, eBPF basics","https://cilium.io/blog/2021/05/11/cni-benchmark"],
-           ["Linux security primitives (namespaces, cgroups, capabilities)",N+"Linux-security-primitives-namespaces-cgroups-capabilities-2e7dabadc8df816ba6b5caed9be94494"]],
-          [["Prática: Stack Loki + Grafana no K8s",N+"Pr-tica-Stack-Loki-Grafana-no-K8s-2e7dabadc8df8176aa1befae924f9aa5"],
-           ["Fluent Bit / Fluentd para coleta",N+"Fluent-Bit-Fluentd-para-coleta-2e7dabadc8df813a881fece3fd3a3cb0"]],
-          [["1 talk em meetup externo OU contribuição open source — planejar",""],
-           ["Entender contribution guidelines",N+"Entender-contribution-guidelines-2e7dabadc8df8132bac0fae80218b33d"]]),
-        w("p3w7",31,
-          [["Prática: Estruturar repo GitOps com Kustomize",N+"Pr-tica-Estruturar-repo-GitOps-com-Kustomize-2e7dabadc8df81feb257d11704a76fb3"],
-           ["Components e replacements (Kustomize)",N+"Components-e-replacements-2e7dabadc8df81ad85aefd5f6d1ddfc4"]],
-          [["Resource management (requests/limits)",N+"Resource-management-requests-limits-2e7dabadc8df814a952efd49761adcee"],
-           ["HPA, VPA, KEDA",N+"HPA-VPA-KEDA-2e7dabadc8df81258e9cded180a7edc0"]],
-          [["Revisão de segurança: audit das policies OPA/Gatekeeper em produção",""]],
-          [["Prática: Instrumentar aplicação com traces",N+"Pr-tica-Instrumentar-aplica-o-com-traces-2e7dabadc8df8151976cdb0e594f48e9"],
-           ["Jaeger / Tempo para armazenamento",N+"Jaeger-Tempo-para-armazenamento-2e7dabadc8df81598fecc62ff991b08c"]],
-          [["2ª RFC ou ADR relevante — compartilhe e colete feedback estruturado",""]]),
-        w("p3w8",32,
-          [["GitHub Actions / GitLab CI para GitOps",N+"GitHub-Actions-GitLab-CI-para-GitOps-2e7dabadc8df81918d13ff633e9d1a3a"],
-           ["Prática: Pipeline completo: build → push → GitOps deploy",N+"Pr-tica-Pipeline-completo-build-push-GitOps-deploy-2e7dabadc8df8126a4c4d33c949ff305"]],
-          [["Probes: liveness, readiness, startup",N+"Probes-liveness-readiness-startup-2e7dabadc8df81708afbd8a38d400577"],
-           ["Prática: Autoscaling baseado em métricas custom",N+"Pr-tica-Autoscaling-baseado-em-m-tricas-custom-2e7dabadc8df8155ae40ed5e23b12653"]],
-          [["Forensics básico em containers",N+"Forensics-b-sico-em-containers-2e7dabadc8df816f90bcd33e8d36d625"]],
-          [["Auto-instrumentation (OTel)",N+"Auto-instrumentation-2e7dabadc8df8111a8b5f11463770c5a"],
-           ["OTel Collector: receivers, processors, exporters",N+"OTel-Collector-receivers-processors-exporters-2e7dabadc8df81af9933d8cf16790b15"]],
-          [["Revisão SLOs: todos os serviços com SLO definido dentro do budget?",""]]),
+        w("m8w1",29,
+          [["Production Kubernetes cap. 6–7: segurança e multi-tenancy em prod","https://www.oreilly.com/library/view/production-kubernetes/9781492092292/"]],
+          [["CKAD: Observability — liveness, readiness, startup probes, logging","https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"]],
+          [["OPA Gatekeeper em produção: constraint templates, admission webhooks","https://open-policy-agent.github.io/gatekeeper/website/"]],
+          [["MTTR e change failure rate: como medir e melhorar no seu contexto","https://dora.dev/research/"]],
+          [["Escreva post técnico externo (Medium/Substack) sobre problema resolvido",""]]),
+        w("m8w2",30,
+          [["Production Kubernetes cap. 8–10: observabilidade, cost management","https://www.oreilly.com/library/view/production-kubernetes/9781492092292/"]],
+          [["CKAD: Services e Networking — NetworkPolicy avançado, Ingress TLS","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Exercício: redesenhe 1 componente da plataforma com aprendizados de segurança",""]],
+          [["Apresente métricas DORA com recomendações para liderança",""]],
+          [["Liderar 1 iniciativa cross-squad: plano formal com objetivos e métricas",""]]),
+        w("m8w3",31,
+          [["GitOps patterns: pull vs push, reconciliation loops, drift detection","https://www.manning.com/books/gitops-and-kubernetes"]],
+          [["CKAD: Deployment strategies — rolling update, blue-green, canary com K8s","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Vulnerability management: CVE triage, EPSS scoring, remediation SLAs","https://www.cisa.gov/known-exploited-vulnerabilities-catalog"]],
+          [["Platform SRE: reliability practices específicas para plataformas internas","https://sre.google/workbook/table-of-contents/"]],
+          [["Post técnico externo: draft 2 — refine e publique o primeiro artigo",""]]),
+        w("m8w4",32,
+          [["Microsserviços: strangler fig pattern, decomposição incremental — trade-offs","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
+          [["CKAD: CronJobs, Jobs em paralelo, init containers — exercícios práticos","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Zero-trust network architecture: princípios e implementação em K8s","https://www.nist.gov/publications/zero-trust-architecture"]],
+          [["OpenTelemetry: baggage propagation, exemplares, correlação automática","https://opentelemetry.io/docs/concepts/signals/baggage/"]],
+          [["Mentoria: estruture 1 sessão de pair review com eng. mais júnior",""]]),
       ]},
       { title:"Mês 9 — CKAD Prep", weeks:[
-        w("p3w9",33,
+        w("m9w1",33,
           [["Exercício: redesenhe 1 componente com visão de platform engineering",""]],
-          [["Distroless e minimal images",N+"Distroless-e-minimal-images-2e7dabadc8df812f8195f11a497ec5e3"],
-           ["Multi-stage builds otimizados",N+"Multi-stage-builds-otimizados-2e7dabadc8df811eb34ad761fed7de9a"]],
-          [["Prática: Setup Falco com alertas customizados",N+"Pr-tica-Setup-Falco-com-alertas-customizados-2e7dabadc8df81f2afacd4f8528f0714"]],
-          [["Prática: Consolidar metrics, logs e traces com OTel",N+"Pr-tica-Consolidar-metrics-logs-e-traces-com-OTel-2e7dabadc8df81bc937feae6a08052d3"]],
-          [["Mentorar: pair programming estruturado com eng. júnior",""],
-           ["First contribution (docs, small fix)",N+"First-contribution-docs-small-fix-2e7dabadc8df81318aadfa7a8bca1f87"]]),
-        w("p3w10",34,
-          [["Prática: Migrar um projeto de ArgoCD para Flux",N+"Pr-tica-Migrar-um-projeto-de-ArgoCD-para-Flux-2e7dabadc8df81b6af4acbfc4df8340b"],
-           ["GitRepository, HelmRelease, Kustomization (Flux)",N+"GitRepository-HelmRelease-Kustomization-2e7dabadc8df8122ab0ec320f22ff3db"]],
-          [["Revisão completa do currículo CKAD",N+"Revis-o-completa-do-curr-culo-CKAD-2e7dabadc8df8164a352f28cdb586188"],
-           ["Speed drills para kubectl",N+"Speed-drills-para-kubectl-2e7dabadc8df814ab143ec71661b9450"]],
-          [["Image automation (Flux Image Reflector)",N+"Image-automation-Flux-Image-Reflector-2e7dabadc8df81398a34eaf6e681864f"]],
-          [["Chaos experiment: Game Day no ambiente qa — documentar resultados",""]],
-          [["Talk em meetup externo OU first PR open source submetido",""],
-           ["Prática: PR aceito em projeto relevante",N+"Pr-tica-PR-aceito-em-projeto-relevante-2e7dabadc8df81d39571ec64b19a84f9"]]),
-        w("p3w11",35,
-          [["Prática: Criar Helm chart para aplicação complexa",N+"Pr-tica-Criar-Helm-chart-para-aplica-o-complexa-2e7dabadc8df81b49a40f5f161762089"],
-           ["Hooks, dependencies, library charts",N+"Hooks-dependencies-library-charts-2e7dabadc8df81e39f00d893bec6c792"]],
-          [["🎯 Mock exam CKAD no killer.sh — identificar lacunas","https://killer.sh/"],
-           ["Mock exams Killer.sh",N+"Mock-exams-Killer-sh-2e7dabadc8df81caa8a3cd41c64694de"]],
-          [["Vulnerability scanning pipelines",N+"Vulnerability-scanning-pipelines-2e7dabadc8df811493ccf3f93fe57188"],
-           ["Runtime policies",N+"Runtime-policies-2e7dabadc8df8152ab00e466c7109d2e"]],
-          [["Prática: Alertas customizados e dashboards",N+"Pr-tica-Alertas-customizados-e-dashboards-2e7dabadc8df8151a78cd31931b3f35f"]],
-          [["GitHub profile atualizado",N+"GitHub-profile-atualizado-2e7dabadc8df81c88a16fff707968623"],
-           ["Documentar projetos principais",N+"Documentar-projetos-principais-2e7dabadc8df8145be3feb624cdb4c74"]]),
-        w("p3w12",36,
-          [["Prática: Otimizar imagens existentes",N+"Pr-tica-Otimizar-imagens-existentes-2e7dabadc8df81798c8eeb19c0f4d146"]],
-          [["Revisão pontos fracos do mock CKAD + exercícios focados","https://github.com/dgkanatsios/CKAD-exercises"],
-           ["Speed drills para kubectl (rodada 2)",N+"Speed-drills-para-kubectl-2e7dabadc8df814ab143ec71661b9450"]],
-          [["SBOM (Software Bill of Materials)",N+"SBOM-Software-Bill-of-Materials-2e7dabadc8df81d5a55ef423127f45a4"]],
-          [["SLO Review: análise de tendências do quarter — todos os serviços saudáveis?",""]],
-          [["Prática: Case study detalhado",N+"Pr-tica-Case-study-detalhado-2e7dabadc8df8106bf4af81feda8db0b"]]),
+          [["CKAD: revisão completa de todos os tópicos — exercícios práticos","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Supply chain: Sigstore, cosign, container image signing no pipeline","https://sigstore.dev/"]],
+          [["OpenTelemetry avançado: custom instrumentation, sampling strategies","https://opentelemetry.io/docs/concepts/sampling/"]],
+          [["Mentorar: pair programming ou review estruturado com eng. júnior",""]]),
+        w("m9w2",34,
+          [["GitOps avançado: multi-cluster management, fleet management patterns","https://www.manning.com/books/gitops-and-kubernetes"]],
+          [["🎯 Mock exam CKAD no killer.sh — identificar lacunas","https://killer.sh/"]],
+          [["Kubernetes network policies avançadas: Cilium, eBPF basics","https://cilium.io/blog/2021/05/11/cni-benchmark"]],
+          [["Chaos experiment: planeje e execute 1 Game Day no ambiente qa",""]],
+          [["1 talk em meetup externo OU contribuição open source — planejar",""]]),
+        w("m9w3",35,
+          [["System design: URL shortener, Pastebin — design completo do zero","https://github.com/donnemartin/system-design-primer"]],
+          [["CKAD: Troubleshooting avançado — network, storage e scheduling failures","https://kubernetes.io/docs/tasks/debug/"]],
+          [["Supply chain: SLSA levels 1-4 — onde está a sua pipeline?","https://slsa.dev/"]],
+          [["Error budget alerts: burn rate alerts, multiwindow policies","https://sre.google/workbook/alerting-on-slos/"]],
+          [["Feedback 360: colete feedback estruturado de 3 colegas diferentes",""]]),
+        w("m9w4",36,
+          [["System design: Design Twitter — scale, feed, notificações, fanout","https://github.com/donnemartin/system-design-primer"]],
+          [["CKAD: Exam simulation — 19 tarefas em 2h, condições reais de exame","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Falco custom rules: escrever rules para o ambiente real, alertas Slack","https://falco.org/docs/rules/"]],
+          [["SLO review: apresente SLO dashboard atualizado para o time",""]],
+          [["ADR: documente decisão de observabilidade do trimestre","https://github.com/joelparkerhenderson/architecture-decision-record"]]),
       ]},
       { title:"Mês 10 — CKAD Sprint", weeks:[
-        w("p3w13",37,
-          [["Exercício: 5 System Designs do zero sem referência","https://github.com/donnemartin/system-design-primer"]],
-          [["🎯 Mock exam CKAD 2 no killer.sh","https://killer.sh/"]],
-          [["Prática: Security baseline completo",N+"Pr-tica-Security-baseline-completo-2e7dabadc8df81338b31d3b0842a7f30"]],
-          [["Revisão SLOs: error budget burn do trimestre",""]],
-          [["ADR: escolha de observabilidade — escrever e partilhar internamente",""]]),
-        w("p3w14",38,
+        w("m10w1",37,
+          [["Revisão System Design — prepare 5 designs do zero sem referência","https://github.com/donnemartin/system-design-primer"]],
+          [["Revisão pontos fracos do mock CKAD + exercícios focados","https://github.com/dgkanatsios/CKAD-exercises"]],
+          [["Revisão de segurança: audit das policies OPA/Gatekeeper em produção",""]],
+          [["Revisão SLOs: todos os serviços com SLO definido dentro do budget?",""]],
+          [["2ª RFC ou ADR relevante — compartilhe e colete feedback estruturado",""]]),
+        w("m10w2",38,
           [["Descanso mental — revisão leve de conceitos-chave",""]],
-          [["🏆 REALIZAR EXAME CKAD",N+"REALIZAR-EXAME-CKAD-2e7dabadc8df81eb8626f4d7de33c499"]],
+          [["🏆 CKAD — Fazer o exame!","https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/"]],
           [["Revisão pós-exame: o que falta para o próximo nível?",""]],
-          [["Revisão de observabilidade: gaps ainda existentes no ambiente atual",""]],
-          [["Retrospectiva da Fase 3 — 3 aprendizados principais",""],
-           ["Retrospectiva do Ano 1",N+"Retrospectiva-do-Ano-1-2e7dabadc8df81d8a60ee836241060f2"]]),
-        w("p3w15",39,
-          [["Post-CKAD: mapear o ecossistema K8s além do exame","https://landscape.cncf.io/"]],
-          [["Helm + GitOps patterns",N+"Helm-GitOps-patterns-2e7dabadc8df81548eb8d4d2e7aa5e78"]],
-          [["Cloud cost review: análise do trimestre — maiores gastos","https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"],
-           ["Kubecost / OpenCost",N+"Kubecost-OpenCost-2e7dabadc8df812c9e13c9d9795ae401"]],
-          [["DORA quarterly: calcular métricas do squad + compare com baseline","https://dora.dev/research/"]],
-          [["Prepare talk interno: aprendizados do percurso CKAD para o squad",""],
-           ["Demo preparation",N+"Demo-preparation-2e7dabadc8df811cad5ec8e359a6b0ec"]]),
-        w("p3w16",40,
+          [["Revisão de observabilidade: gaps ainda existentes no ambiente actual",""]],
+          [["Retrospectiva da Fase 3 — 3 aprendizados principais",""]]),
+        w("m10w3",39,
+          [["Post-CKAD: mapear o ecossistema K8s além do exame — o que explorar?","https://landscape.cncf.io/"]],
+          [["K8s: kubectl debug, ephemeral containers, crictl — troubleshooting toolkit","https://kubernetes.io/docs/tasks/debug/debug-running-pod/"]],
+          [["Cloud cost review: análise de custo do trimestre — maiores gastos","https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"]],
+          [["DORA quarterly: calcule as 4 métricas do squad e compare com baseline","https://dora.dev/research/"]],
+          [["Prepare talk interno: aprendizados do percurso CKAD para o squad",""]]),
+        w("m10w4",40,
           [["Transição para Fase 4: identifique gaps de platform engineering a atacar",""]],
-          [["Prática: Migrar Ingress para Gateway API em lab","https://kubernetes.io/docs/concepts/services-networking/gateway/"]],
-          [["FinOps: proposta de rightsizing baseada na análise do trimestre",""],
-           ["Right-sizing workloads",N+"Right-sizing-workloads-2e7dabadc8df81c692a2f19d3794524c"]],
-          [["Retrospectiva de observabilidade: cobertura atual vs target desejado",""]],
+          [["K8s: Gateway API, sidecar containers stable — implicações para o ambiente","https://kubernetes.io/docs/concepts/services-networking/gateway/"]],
+          [["FinOps: proposta de rightsizing baseada na análise do trimestre","https://docs.aws.amazon.com/cost-management/latest/userguide/rightsizing-understanding.html"]],
+          [["Retrospectiva de observabilidade: cobertura actual vs target desejado",""]],
           [["Retrospectiva expandida da Fase 3 — roadmap update para os próximos 6m",""]]),
       ]},
     ]
   },
-  // ── FASE 4 ── Bridge Senior + Platform Engineering (Meses 11–12, Semanas 41–48)
+
+  // ─── FASE 4 — Bridge Senior (Meses 11–12) ────────────────────────────────
   {
-    id:"p4",num:4,title:"Bridge Senior",period:"Meses 11–12",cert:"→ CKS prep iniciado",
+    id:"p4", num:4, title:"Bridge Senior", period:"Meses 11–12", weeks_label:"Semanas 41–48",
+    cert:"→ CKS prep iniciado",
     goal:"Comportamentos de Senior Forte consolidados. Plataforma como produto. Visibilidade interna crescente.",
     months:[
       { title:"Mês 11", weeks:[
-        w("p4w1",41,
-          [["Platform as a Product mindset",N+"Platform-as-a-Product-mindset-2e7dabadc8df814f9740c90b4810fa31"],
-           ["O que é uma Internal Developer Platform",N+"O-que-uma-Internal-Developer-Platform-2e7dabadc8df81e1bc73ec53fff61f2a"]],
+        w("m11w1",41,
+          [["Plataforma como produto: DORA + Team Topologies aplicados à plataforma","https://platformengineering.org/blog"]],
           [["CRDs: como funcionam, kubebuilder basics, controller-runtime","https://book.kubebuilder.io/"]],
-          [["Software Catalog (Backstage)",N+"Software-Catalog-2e7dabadc8df81ab8cfadd62a00fd3ed"],
-           ["Prática: Instalar Backstage e popular catálogo",N+"Pr-tica-Instalar-Backstage-e-popular-cat-logo-2e7dabadc8df8180923de787aa9a7711"]],
-          [["Error Budgets na prática: dashboard de SLOs para 2 serviços reais",""],
-           ["High availability e scaling (Prometheus/Grafana)",N+"High-availability-e-scaling-2e7dabadc8df8142866bcf6040e10860"]],
-          [["Feedback técnico: dar e receber formalmente com 1 colega",""],
-           ["Como dar feedback construtivo",N+"Como-dar-feedback-construtivo-2e7dabadc8df81ed8c3ad0a2b9e4f1c6"]]),
-        w("p4w2",42,
-          [["Developer Experience (DevEx)",N+"Developer-Experience-DevEx-2e7dabadc8df81198e41e152013d682f"],
-           ["Golden paths para desenvolvedores",N+"Golden-paths-para-desenvolvedores-2e7dabadc8df814ea5abe2de5d34d6cb"]],
+          [["Backstage: configurar software catalog para o squad/empresa","https://backstage.io/docs"]],
+          [["Error Budgets na prática: dashboard de SLOs para 2 serviços reais",""]],
+          [["Feedback técnico: dar e receber formalmente com 1 colega",""]]),
+        w("m11w2",42,
+          [["IDP design: o que a plataforma precisa oferecer para developers?","https://platformengineering.org/blog"]],
           [["Operator Pattern: reconciliation loop, finalizers, status conditions","https://www.oreilly.com/library/view/kubernetes-operators/9781492048039/"]],
-          [["Software Templates (Scaffolding — Backstage)",N+"Software-Templates-Scaffolding-2e7dabadc8df81f3a957d87c2350cc1c"],
-           ["Prática: Criar template para microserviço",N+"Pr-tica-Criar-template-para-microservi-o-2e7dabadc8df81e79d34d7967e26fc4d"]],
+          [["Crossplane: composições, XRDs, AWS provider — ambiente de lab","https://docs.crossplane.io/"]],
           [["Reliability reviews: processo formal de revisão de SLOs por serviço",""]],
-          [["Mentorar: pair programming semanal com eng. júnior (formalizar)",""],
-           ["Code review como ensino",N+"Code-review-como-ensino-2e7dabadc8df816fa950ef016aaee9c3"]]),
-        w("p4w3",43,
-          [["Métricas de plataforma",N+"M-tricas-de-plataforma-2e7dabadc8df813ab315ff41470acbbd"],
-           ["Platform APIs design",N+"Platform-APIs-design-2e7dabadc8df8190b933f493c3a01531"]],
-          [["Admission webhooks: mutating e validating — escrever 1 simples","https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/"]],
-          [["Plugin architecture (Backstage)",N+"Plugin-architecture-2e7dabadc8df81c5bfecd27ee5dbbc70"],
-           ["TechDocs para documentação",N+"TechDocs-para-documenta-o-2e7dabadc8df8154926bd6ee9ac1daec"]],
+          [["Mentorar: pair programming semanal com eng. júnior — formalizar",""]]),
+        w("m11w3",43,
+          [["Conway's Law na prática: como a estrutura do time afeta a arquitetura","https://martinfowler.com/bliki/ConwaysLaw.html"]],
+          [["Admission webhooks: mutating e validating — escrever um simples em Go","https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/"]],
+          [["Network policies: zero-trust networking no cluster — implementar","https://kubernetes.io/docs/concepts/services-networking/network-policies/"]],
           [["SLO burndown: identificar serviços fora do error budget — plano de ação",""]],
-          [["Staff archetype deep dive: qual arquétipo quer ser? Por quê?","https://staffeng.com/guides/staff-archetypes/"],
-           ["Staff Engineer path vs Management",N+"Staff-Engineer-path-vs-Management-2e7dabadc8df8179afdeec579b9c4824"]]),
-        w("p4w4",44,
-          [["Backstage + Crossplane + ArgoCD",N+"Backstage-Crossplane-ArgoCD-2e7dabadc8df81949716c464ced42c90"]],
-          [["Simple controller: escrever controller com controller-runtime","https://book.kubebuilder.io/cronjob-tutorial/controller-implementation"]],
-          [["Prática: Adicionar plugins relevantes ao Backstage",N+"Pr-tica-Adicionar-plugins-relevantes-2e7dabadc8df8140bb84c12a1baedea5"],
-           ["Integração com Git providers",N+"Integra-o-com-Git-providers-2e7dabadc8df81899e39e6596098a4e0"]],
+          [["Staff archetype deep dive: qual arquétipo quer ser? Por quê?","https://staffeng.com/guides/staff-archetypes/"]]),
+        w("m11w4",44,
+          [["Platform topology: mapear dependências completas da plataforma actual",""]],
+          [["Simple controller: escrever controller com controller-runtime — loop básico","https://book.kubebuilder.io/cronjob-tutorial/controller-implementation"]],
+          [["Cloud security posture: CSPM, Prowler audit — benchmark do ambiente","https://github.com/prowler-cloud/prowler"]],
           [["Game Day em staging: chaos experiment + documentação de resultados",""]],
-          [["Apresentação interna: decisão técnica relevante do mês para liderança",""],
-           ["Prática: Propor mudança técnica significativa",N+"Pr-tica-Propor-mudan-a-t-cnica-significativa-2e7dabadc8df81289cb8ec81cea51a57"]]),
+          [["Apresentação interna: decisão técnica relevante do mês para liderança",""]]),
       ]},
       { title:"Mês 12", weeks:[
-        w("p4w5",45,
-          [["Istio architecture",N+"Istio-architecture-2e7dabadc8df81109503fa162d8bcb39"],
-           ["Prática: Setup Istio em cluster",N+"Pr-tica-Setup-Istio-em-cluster-2e7dabadc8df81bd9494e6a47f886d81"]],
+        w("m12w1",45,
+          [["Platform metrics: como medir sucesso da plataforma (SPACE, DevEx)","https://queue.acm.org/detail.cfm?id=3454124"]],
           [["Kubernetes Patterns: Operator, Controller, Elastic Scale, Health Probe","https://www.redhat.com/en/engage/kubernetes-containers-architecture-s-201910240918"]],
-          [["Istio: Observability features",N+"Observability-features-Istio-2e7dabadc8df81758abcc8a0448184ca"],
-           ["Prática: Canary deployment com Istio",N+"Pr-tica-Canary-deployment-com-Istio-2e7dabadc8df815d8b0bdc6c2e7a6f21"]],
+          [["GitOps: Flux vs ArgoCD — quando usar qual? Escreva um ADR.","https://www.manning.com/books/gitops-and-kubernetes"]],
           [["Propor Game Day formal para o time — planeamento e execução",""]],
-          [["RFC: proposta de IDP incremental para o squad — visão 6 meses",""],
-           ["Prática: Planejar projeto de 3 meses",N+"Pr-tica-Planejar-projeto-de-3-meses-2e7dabadc8df81a3adafcffbe171c694"]]),
-        w("p4w6",46,
-          [["Multi-cluster service mesh",N+"Multi-cluster-service-mesh-2e7dabadc8df816da7b5c589ec851569"],
-           ["Security features Istio (mTLS, AuthZ)",N+"Security-features-mTLS-AuthZ-2e7dabadc8df81a0a936d0f0d9f246ad"]],
+          [["RFC: proposta de IDP incremental para o squad — visão 6 meses",""]]),
+        w("m12w2",46,
+          [["Retrospectiva arquitetural: decisões dos últimos 12 meses — o que mudaria?",""]],
           [["Multi-cluster GitOps: ApplicationSets com cluster generators em prod","https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/"]],
-          [["FinOps: análise de custo do ambiente atual — maiores gastos e otimizações","https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"],
-           ["Prática: Otimizar custos EKS",N+"Pr-tica-Otimizar-custos-EKS-2e7dabadc8df81c5b2f9dea5709deef0"]],
-          [["Disaster recovery planning",N+"Disaster-recovery-planning-2e7dabadc8df81dbaf4dd2235fc84808"],
-           ["Prática: DR plan para plataforma K8s",N+"Pr-tica-DR-plan-para-plataforma-K8s-2e7dabadc8df814db6bde0847202822c"]],
-          [["Retrospectiva arquitetural: 12 meses de decisões — o que mudaria?",""]]),
-        w("p4w7",47,
-          [["AWS Provider deep dive (Crossplane)",N+"AWS-Provider-deep-dive-2e7dabadc8df81c0860cca46a3114f12"],
-           ["Composition Functions (Crossplane)",N+"Composition-Functions-2e7dabadc8df816cbb7de8124ec4a530"]],
-          [["Operator avançado: status subresource, conditions, owner references","https://book.kubebuilder.io/"],
-           ["Prática: Self-service database provisioning",N+"Pr-tica-Self-service-database-provisioning-2e7dabadc8df818887ecf57777ba9f24"]],
-          [["Ambient mesh (sidecar-less — Istio)",N+"Ambient-mesh-sidecar-less-2e7dabadc8df81a3b39bee84acc61609"]],
-          [["Reliability: propor processo formal de SLO review para toda a squad",""],
-           ["Prática: Setup cost monitoring",N+"Pr-tica-Setup-cost-monitoring-2e7dabadc8df81c7b4c2e03412bf6bae"]],
-          [["RFC revisão: iterar sobre o IDP RFC com feedback dos stakeholders",""],
-           ["Building consensus",N+"Building-consensus-2e7dabadc8df81139f0bcb5e2a4ec809"]]),
-        w("p4w8",48,
-          [["GitOps + Crossplane",N+"GitOps-Crossplane-2e7dabadc8df81e8b809f97d9ad328c9"],
-           ["Prática: Plataforma self-service completa",N+"Pr-tica-Plataforma-self-service-completa-2e7dabadc8df81e1af9ce75c1bfea262"]],
+          [["FinOps: análise de custo do ambiente actual — maiores gastos e otimizações","https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"]],
+          [["Retrospectiva de observabilidade: gaps ainda existentes",""]],
+          [["Retrospectiva da Fase 4 — atualizar roadmap para próximas fases",""]]),
+        w("m12w3",47,
+          [["Platform as product v2: roadmap da plataforma para próximos 6 meses","https://platformengineering.org/blog"]],
+          [["Operator avançado: status subresource, conditions, owner references","https://book.kubebuilder.io/"]],
+          [["Backstage: criar plugin simples para workflow interno do squad","https://backstage.io/docs/plugins/create-a-plugin"]],
+          [["Reliability: propor processo formal de SLO review para toda a squad",""]],
+          [["RFC revisão: iterar sobre o IDP RFC com feedback dos stakeholders",""]]),
+        w("m12w4",48,
+          [["Arquitetura de referência: documente a plataforma actual como IDP completo",""]],
           [["K8s patterns revisão: todos os padrões estudados — onde aplicar cada?","https://www.redhat.com/en/engage/kubernetes-containers-architecture-s-201910240918"]],
-          [["Prática: EKS cluster production-ready",N+"Pr-tica-EKS-cluster-production-ready-2e7dabadc8df81c7a7b3ecf2ddfb5cd8"],
-           ["Pod Identity (IRSA evolution)",N+"Pod-Identity-IRSA-evolution-2e7dabadc8df8154af5ec15ee55af9d8"]],
-          [["FinOps: proposta formal de otimização de custo para liderança técnica",""],
-           ["Cluster autoscaling (Karpenter)",N+"Cluster-autoscaling-Karpenter-2e7dabadc8df8152b23bffbe69c6c5b9"]],
-          [["Retrospectiva expandida da Fase 4 — entrada na Fase CKS",""],
-           ["Mid-Year Leadership Review",N+"Mid-Year-Leadership-Review-2e7dabadc8df81619330f278b5ae94f5"]]),
+          [["FinOps: proposta formal de otimização de custo para liderança técnica",""]],
+          [["Game Day retrospective: resultados + próximos experimentos planeados",""]],
+          [["Retrospectiva expandida da Fase 4 — entrada na Fase de CKS",""]]),
       ]},
     ]
   },
-  // ── FASE 5 ── CKS + DevSecOps (Meses 13–16, Semanas 49–64) ───────────────
+
+  // ─── FASE 5 — CKS + DevSecOps (Meses 13–16) ──────────────────────────────
   {
-    id:"p5",num:5,title:"CKS + DevSecOps",period:"Meses 13–16",cert:"🎓 CKS — Meta: Semana 62",
+    id:"p5", num:5, title:"CKS + DevSecOps", period:"Meses 13–16", weeks_label:"Semanas 49–64",
+    cert:"🎓 CKS — Meta: Mês 16",
     goal:"CKS. DevSecOps mindset consolidado. Impacto cross-team formal. Mentoria ativa.",
     months:[
       { title:"Mês 13", weeks:[
-        w("p5w1",49,
+        w("m13w1",49,
           [["Building Microservices cap. 1–4: decomposição, limites de serviço","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
-          [["Mapear currículo CKS",N+"Mapear-curr-culo-CKS-2e7dabadc8df818faa9ad88c00b7383c"],
-           ["Identificar gaps de conhecimento",N+"Identificar-gaps-de-conhecimento-2e7dabadc8df8184bc8fc463e12fe797"],
-           ["CIS Benchmarks para Kubernetes",N+"CIS-Benchmarks-para-Kubernetes-2e7dabadc8df8186854ee39e4a029b09"]],
-          [["DevSecOps pipeline: Trivy, Semgrep, SAST integrados no CI/CD","https://trivy.dev/"],
-           ["Prática: Pipeline com scanning e signing",N+"Pr-tica-Pipeline-com-scanning-e-signing-2e7dabadc8df8107a7f2e21f1f78b246"]],
+          [["CKS: Cluster Hardening — API server flags, RBAC mínimo, node security","https://github.com/cncf/curriculum"]],
+          [["DevSecOps pipeline: Trivy, Semgrep, SAST integrados no CI/CD","https://trivy.dev/"]],
           [["Propor e executar Game Day formal — documentar resultados",""]],
-          [["Iniciar mentoria formal: definir objetivos com eng. júnior",""],
-           ["Especialização: Definir trilha (Platform/SRE/Security/Data)",N+"Especializa-o-Definir-trilha-Platform-SRE-Security-Data-2e7dabadc8df81d5afc9c65afae7ad76"]]),
-        w("p5w2",50,
+          [["Iniciar mentoria formal: definir objetivos com eng. júnior",""]]),
+        w("m13w2",50,
           [["Building Microservices cap. 5–7: comunicação, resiliência, testes","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
-          [["API Server security",N+"API-Server-security-2e7dabadc8df8121983ac73ab36460f1"],
-           ["Prática: Hardening de cluster seguindo CIS",N+"Pr-tica-Hardening-de-cluster-seguindo-CIS-2e7dabadc8df81da9a99d7538a6f608c"]],
-          [["Zero Trust em Kubernetes: mTLS, SPIFFE/SPIRE basics","https://spiffe.io/docs/latest/spiffe-about/overview/"],
-           ["mTLS e service mesh security",N+"mTLS-e-service-mesh-security-2e7dabadc8df81e3a838eae50e38a309"]],
-          [["Chaos: post-mortem do Game Day — lições aprendidas documentadas",""],
-           ["Incident command","https://www.notion.so/Incident-command"]],
-          [["Contribuição open source: identificar issue em projeto relevante",""],
-           ["Especialização: Semana 1-2 da trilha escolhida",N+"Especializa-o-Semana-1-2-da-trilha-escolhida-2e7dabadc8df814497a2d282134cc29a"]]),
-        w("p5w3",51,
-          [["Building Microservices cap. 8–10: observabilidade, segurança, deploy","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
-          [["Kernel hardening",N+"Kernel-hardening-2e7dabadc8df8178970dd8fc745b1295"],
-           ["RBAC avançado e audit logging",N+"RBAC-avan-ado-e-audit-logging-2e7dabadc8df81d89328ed5450b6e73a"],
-           ["Node security",N+"Node-security-2e7dabadc8df81d7a4e2e5d40996caa4"]],
-          [["Vault Agent Injector para K8s",N+"Vault-Agent-Injector-para-K8s-2e7dabadc8df81b2a7abebab714ada1d"],
-           ["HashiCorp Vault deep dive",N+"HashiCorp-Vault-deep-dive-2e7dabadc8df8157b227df67ba947e1d"]],
-          [["Reliability: revisão trimestral de SLOs — serviços dentro do budget?",""]],
-          [["Liderar 1 iniciativa cross-squad: plano formal com objetivos",""],
-           ["Especialização: Semana 3-4 da trilha escolhida",N+"Especializa-o-Semana-3-4-da-trilha-escolhida-2e7dabadc8df81d7b9aed12baa3e0e68"]]),
-        w("p5w4",52,
-          [["Building Microservices cap. 11–14: migração, organização, futuro","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
-          [["Pod-to-Pod encryption",N+"Pod-to-Pod-encryption-2e7dabadc8df81fcbedbe1327e65912d"],
-           ["Network policies para system namespaces",N+"Network-policies-para-system-namespaces-2e7dabadc8df81c58318f2e0d7b6c150"],
-           ["Prática: Secure node configuration",N+"Pr-tica-Secure-node-configuration-2e7dabadc8df8162a8d7d263b8e738b7"]],
-          [["Prática: Integração completa Vault + K8s",N+"Pr-tica-Integra-o-completa-Vault-K8s-2e7dabadc8df81cca253f11c5227f334"],
-           ["Pod Security Standards enforcement",N+"Pod-Security-Standards-enforcement-2e7dabadc8df81e5bfa1f7382e4dfc37"]],
-          [["DORA revisão semestral: como o squad evoluiu desde o início?","https://dora.dev/research/"]],
-          [["Post técnico externo: DevSecOps na prática — publicar",""],
-           ["Especialização: Semana 5-6 da trilha escolhida",N+"Especializa-o-Semana-5-6-da-trilha-escolhida-2e7dabadc8df814bbb22d8ba36e5803d"]]),
+          [["CKS: System Hardening — AppArmor, seccomp, kernel capabilities","https://www.oreilly.com/library/view/hacking-kubernetes/9781492081722/"]],
+          [["Zero Trust em Kubernetes: mTLS, SPIFFE/SPIRE basics","https://spiffe.io/docs/latest/spiffe-about/overview/"]],
+          [["Chaos: post-mortem do Game Day — lições aprendidas documentadas",""]],
+          [["Contribuição open source: identificar issue em projeto relevante",""]]),
+        w("m13w3",51,
+          [["Threat modeling: STRIDE, PASTA — modelar 1 serviço real do ambiente","https://owasp.org/www-community/Threat_Modeling"]],
+          [["CKS: Network policies — microsegmentação com Cilium em lab","https://cilium.io/docs/"]],
+          [["SAST deep: customizar rules Semgrep para o codebase da empresa","https://semgrep.dev/docs/writing-rules/overview/"]],
+          [["Incident response playbook: criar para o serviço mais crítico que opera",""]],
+          [["Liderar: facilitar retro técnica de segurança com o squad",""]]),
+        w("m13w4",52,
+          [["Security architecture: defense in depth para aplicações cloud-native","https://www.cncf.io/blog/2022/06/07/cloud-native-security-whitepaper-v2/"]],
+          [["CKS: Secrets management avançado — external secrets, sealed secrets","https://external-secrets.io/"]],
+          [["Container image scanning: integrar Grype no pipeline CI — quality gates","https://github.com/anchore/grype"]],
+          [["Chaos: multi-pod failure experiment — documentar blast radius real",""]],
+          [["Mentoria: sessão de career growth com eng. júnior",""]]),
       ]},
       { title:"Mês 14", weeks:[
-        w("p5w5",53,
-          [["Threat modeling: STRIDE, PASTA — modelar 1 serviço real do ambiente","https://owasp.org/www-community/Threat_Modeling"]],
-          [["Security contexts avançados",N+"Security-contexts-avan-ados-2e7dabadc8df81fb9f5accd76e074e49"],
-           ["Prática: Implementar least privilege",N+"Pr-tica-Implementar-least-privilege-2e7dabadc8df8142b887fa8f5d3c945c"],
-           ["Service account security",N+"Service-account-security-2e7dabadc8df81dcad55eaf5e7eeb8d4"]],
-          [["Kyverno como alternativa",N+"Kyverno-como-alternativa-2e7dabadc8df816da90ae6e5497b5f9e"],
-           ["Prática: Policy-as-Code para compliance",N+"Pr-tica-Policy-as-Code-para-compliance-2e7dabadc8df81cba068f4fe02934c83"]],
-          [["Liderar 1 iniciativa cross-squad: plano formal com objetivos e métricas",""]],
-          [["Especialização: Semana 7-8 da trilha escolhida",N+"Especializa-o-Semana-7-8-da-trilha-escolhida-2e7dabadc8df81e9bc2fc6f163266f14"]]),
-        w("p5w6",54,
-          [["Privacy by design: GDPR, data residency, encryption at rest","https://gdpr.eu/"]],
-          [["Validating admission webhooks",N+"Validating-admission-webhooks-2e7dabadc8df81439c57f8cba835447a"],
-           ["Image digest pinning",N+"Image-digest-pinning-2e7dabadc8df8119b804c79c4dc93d4b"],
-           ["Prática: Admission controller customizado",N+"Pr-tica-Admission-controller-customizado-2e7dabadc8df811aa37cd5a163067a82"]],
-          [["Network Policies avançadas",N+"Network-Policies-avan-adas-2e7dabadc8df8151a03dcec8c977f07f"],
-           ["Prática: Zero-trust networking no cluster",N+"Pr-tica-Zero-trust-networking-no-cluster-2e7dabadc8df81498f44c5a51d42df5d"]],
-          [["SLO reviews: reunião formal com stakeholders apresentando métricas",""]],
-          [["Especialização: Semana 9-10 da trilha escolhida",N+"Especializa-o-Semana-9-10-da-trilha-escolhida-2e7dabadc8df8152a881d88609355f26"]]),
-        w("p5w7",55,
-          [["Compliance as code: OPA para governance — escrever policies de compliance","https://www.openpolicyagent.org/docs/latest/"]],
-          [["Private registries security",N+"Private-registries-security-2e7dabadc8df81a29c9fe4e9cf8c9762"],
-           ["Audit logs analysis",N+"Audit-logs-analysis-2e7dabadc8df814cb528f5fa982c6ac9"],
-           ["Behavioral analysis",N+"Behavioral-analysis-2e7dabadc8df8115be03fc325cf93642"]],
-          [["Ingress security (WAF, rate limiting)",N+"Ingress-security-WAF-rate-limiting-2e7dabadc8df81668c9fdf3a0894cf1d"]],
-          [["Incident response em K8s",N+"Incident-response-em-K8s-2e7dabadc8df81ba9c0cce80bc7ca954"],
-           ["Prática: Simular e responder a incidentes",N+"Pr-tica-Simular-e-responder-a-incidentes-2e7dabadc8df81caa48afd50262ac3c5"]],
-          [["Especialização: Semana 11-12 da trilha escolhida",N+"Especializa-o-Semana-11-12-da-trilha-escolhida-2e7dabadc8df81c9a709d284f4b42ee3"]]),
-        w("p5w8",56,
-          [["Security architecture: defense in depth para aplicações cloud-native","https://www.cncf.io/blog/"]],
-          [["Falco para detecção de ameaças (avançado)",N+"Falco-para-detec-o-de-amea-as-2e7dabadc8df8143a8d6c3e41756fc44"],
-           ["Prática: Setup Falco com alertas customizados",N+"Pr-tica-Setup-Falco-com-alertas-customizados-2e7dabadc8df81f2afacd4f8528f0714"]],
+        w("m14w1",53,
+          [["Building Microservices cap. 8–10: observabilidade, segurança, deploy","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
+          [["CKS: Supply Chain Security — Trivy, Falco, image signing, OPA Gatekeeper","https://falco.org/docs/"]],
+          [["SBOM: software bill of materials, Syft, Grype — integrar no pipeline","https://anchore.com/sbom/"]],
+          [["Reliability: revisão trimestral de SLOs — serviços dentro do budget?",""]],
+          [["Liderar 1 iniciativa cross-squad: plano formal com objetivos e métricas",""]]),
+        w("m14w2",54,
+          [["Building Microservices cap. 11–14: migração, organização, futuro","https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/"]],
+          [["CKS: Monitoring e Runtime Security — audit logs, Falco, incident response","https://github.com/walidshaari/Certified-Kubernetes-Security-Specialist"]],
           [["Revisar postura de segurança completa: gaps vs roadmap de correção",""]],
-          [["DORA revisão: análise de impacto das últimas 2 fases","https://dora.dev/research/"]],
-          [["Especialização: Projeto final da trilha",N+"Especializa-o-Projeto-final-da-trilha-2e7dabadc8df8187b834cbe42dbe137e"]]),
+          [["DORA revisão semestral: como o squad evoluiu desde o início?","https://dora.dev/research/"]],
+          [["Post técnico externo: DevSecOps na prática — publicar",""]]),
+        w("m14w3",55,
+          [["Compliance as code: OPA para governance — escrever policies de compliance","https://www.openpolicyagent.org/docs/latest/"]],
+          [["CKS: Pod security — securityContext, capabilities, read-only filesystem","https://kubernetes.io/docs/concepts/security/pod-security-standards/"]],
+          [["DAST: integrar OWASP ZAP no pipeline de staging — scan automático","https://www.zaproxy.org/"]],
+          [["SLO para CI/CD: reliability do próprio toolchain — definir e medir",""]],
+          [["Post técnico externo: publicar artigo final sobre DevSecOps",""]]),
+        w("m14w4",56,
+          [["Privacy by design: GDPR, data residency, encryption at rest","https://gdpr.eu/"]],
+          [["CKS: Audit logging — configurar audit policy completa no cluster","https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/"]],
+          [["Incident response: criar runbook formal de resposta a CVE crítico",""]],
+          [["MTTR deep: analisar 3 incidentes passados — padrões e melhorias",""]],
+          [["Cross-squad: apresentar plano de DevSecOps para outros times",""]]),
       ]},
       { title:"Mês 15 — CKS Prep", weeks:[
-        w("p5w9",57,
+        w("m15w1",57,
           [["Revisão de System Design focada em segurança — threat modeling de 1 sistema",""]],
-          [["CKS Mock exams intensivos — 1ª rodada",N+"CKS-Mock-exams-intensivos-2e7dabadc8df81088c7ec11a64fdc154"]],
-          [["Revisão de segurança: controles implementados vs CKS curriculum",""],
-           ["GCP/Azure: Compute e Kubernetes basics",N+"GCP-Azure-Compute-e-Kubernetes-basics-2e7dabadc8df817c99f6d6471f3beeb5"]],
+          [["🎯 Mock exam CKS no killer.sh","https://killer.sh/"]],
+          [["Revisão de segurança: controles implementados vs CKS curriculum",""]],
           [["Chaos experiment avançado: multi-region failure simulation",""]],
-          [["Preparar talk técnico para meetup externo",""],
-           ["Prática: Preparar talk de 15 min",N+"Pr-tica-Preparar-talk-de-15-min-2e7dabadc8df813c945bcf2ab6d813b8"]]),
-        w("p5w10",58,
+          [["Preparar talk técnico para meetup externo",""]]),
+        w("m15w2",58,
           [["Revisão de pontos fracos identificados no mock CKS",""]],
-          [["Revisão de pontos fracos CKS",N+"Revis-o-de-pontos-fracos-CKS-2e7dabadc8df81a4aeb6edbc3fad704a"],
-           ["CKS Mock exams intensivos — exercícios focados",N+"CKS-Mock-exams-intensivos-2e7dabadc8df81088c7ec11a64fdc154"]],
-          [["GCP/Azure: Networking differences",N+"GCP-Azure-Networking-differences-2e7dabadc8df819a8358d86fe01e12ed"],
-           ["Prática: Deploy básico em segundo cloud",N+"Pr-tica-Deploy-b-sico-em-segundo-cloud-2e7dabadc8df81ba92d8c3bea0881888"]],
+          [["Revisão CKS: exercícios focados em áreas fracas","https://github.com/walidshaari/Certified-Kubernetes-Security-Specialist"]],
+          [["Implementar 1 melhoria de segurança real no ambiente de produção",""]],
           [["SLO reviews: reunião formal com stakeholders apresentando métricas",""]],
-          [["Mentoria: revisão de progresso com eng. júnior — ajuste de plano",""],
-           ["Networking strategy",N+"Networking-strategy-2e7dabadc8df8188bbf3e70d8bc10751"]]),
-        w("p5w11",59,
+          [["Mentoria: revisão de progresso com eng. júnior — ajuste de plano",""]]),
+        w("m15w3",59,
           [["Threat intel: CVE tracking, NVD, EPSS scores — como priorizar patches","https://nvd.nist.gov/"]],
-          [["CKS Mock exams intensivos — 2ª rodada",N+"CKS-Mock-exams-intensivos-2e7dabadc8df81088c7ec11a64fdc154"]],
-          [["GCP/Azure: IAM model",N+"GCP-Azure-IAM-model-2e7dabadc8df81dcbe55c18f16dc5427"],
-           ["Abstração vs cloud-native",N+"Abstra-o-vs-cloud-native-2e7dabadc8df81ef87c8c9393b2bfe38"]],
+          [["CKS: mock domain cluster hardening — exercícios específicos focados","https://github.com/walidshaari/Certified-Kubernetes-Security-Specialist"]],
+          [["Falco rules audit: cobertura actual vs surface de ataque real","https://falco.org/docs/rules/"]],
           [["SLO para segurança: MTTR de vulnerabilidades, patch compliance rate",""]],
-          [["Security roadmap: próximos 6 meses de melhorias à liderança",""],
-           ["Target companies/roles",N+"Target-companies-roles-2e7dabadc8df8180afccc03d07f63145"]]),
-        w("p5w12",60,
-          [["Terraform multi-cloud",N+"Terraform-multi-cloud-2e7dabadc8df81e38532cfd8042abf05"],
-           ["Prática: Mesmo workload em 2 clouds",N+"Pr-tica-Mesmo-workload-em-2-clouds-2e7dabadc8df81e393bcee34a2d940ac"]],
-          [["CKS: revisão final de todos os domínios","https://github.com/walidshaari/Certified-Kubernetes-Security-Specialist"]],
-          [["Prática: Arquitetura hub-spoke",N+"Pr-tica-Arquitetura-hub-spoke-2e7dabadc8df81b2801ff9d39aad8d48"],
-           ["Network Firewall",N+"Network-Firewall-2e7dabadc8df811e82c0f37a6bb6d24f"]],
-          [["Security chaos: testar controls de segurança em staging",""]],
-          [["LinkedIn otimizado",N+"LinkedIn-otimizado-2e7dabadc8df8138ae3fe4ed336802dc"],
-           ["Behavioral questions (STAR method)",N+"Behavioral-questions-STAR-method-2e7dabadc8df8113ac79e99316ba054a"]]),
+          [["Security roadmap: apresentar próximos 6 meses de melhorias à liderança",""]]),
+        w("m15w4",60,
+          [["Security design patterns: RBAC mínimo, least privilege, segmentação real","https://kubernetes.io/docs/concepts/security/"]],
+          [["CKS: mock domain supply chain security — exercícios práticos focados","https://github.com/walidshaari/Certified-Kubernetes-Security-Specialist"]],
+          [["Implementar 2ª melhoria de segurança em produção",""]],
+          [["Security chaos: testar controls de segurança em staging — resultados",""]],
+          [["Mentoria: revisão de carreira com eng. júnior — roadmap próximo trimestre",""]]),
       ]},
       { title:"Mês 16 — CKS Sprint", weeks:[
-        w("p5w13",61,
+        w("m16w1",61,
           [["Revisão leve: conceitos-chave de System Design e arquitetura de segurança",""]],
-          [["🎯 Mock exam final CKS — avaliar evolução","https://killer.sh/"],
-           ["Revisão de pontos fracos CKS (pós-mock final)",N+"Revis-o-de-pontos-fracos-CKS-2e7dabadc8df81a4aeb6edbc3fad704a"]],
-          [["AWS Organizations e SCPs",N+"AWS-Organizations-e-SCPs-2e7dabadc8df81508e8cf822f6ad5f5f"],
-           ["IAM Identity Center",N+"IAM-Identity-Center-2e7dabadc8df817b871fdbf345f9434f"]],
+          [["🎯 Mock exam 2 CKS — avaliar evolução vs mock 1","https://killer.sh/"]],
+          [["Roadmap de segurança: próximos 6 meses de melhorias planeadas",""]],
           [["Apresentar métricas de confiabilidade para liderança técnica",""]],
-          [["Retrospectiva de 15 meses: como você mudou como engenheiro?",""],
-           ["System design interview practice",N+"System-design-interview-practice-2e7dabadc8df8198a0efc2d4a299fdec"]]),
-        w("p5w14",62,
+          [["Retrospectiva de 15 meses: como você mudou como engenheiro?",""]]),
+        w("m16w2",62,
           [["Descanso mental — revisão leve dos domínios CKS",""]],
-          [["🏆 REALIZAR EXAME CKS",N+"REALIZAR-EXAME-CKS-2e7dabadc8df81f7b179d302b3ad71d2"]],
+          [["🏆 CKS — Fazer o exame!","https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/"]],
           [["Retrospectiva de segurança: o que a jornada CKS ensinou sobre a infra?",""]],
           [["Planejar próxima fase de observabilidade com AI-driven insights",""]],
-          [["Retrospectiva da Fase 5 — 3 aprendizados principais",""],
-           ["Retrospectiva do Ano 2",N+"Retrospectiva-do-Ano-2-2e7dabadc8df8165af1dcb612f808d2a"]]),
-        w("p5w15",63,
-          [["Post-CKS: mapa de certificações — o que vem a seguir?","https://landscape.cncf.io/"]],
-          [["EKS add-ons management",N+"EKS-add-ons-management-2e7dabadc8df81c2b532dbea3ea7d3ed"],
-           ["EKS Anywhere",N+"EKS-Anywhere-2e7dabadc8df81218510f2bbbb75252c"]],
-          [["FinOps: revisão anual de custo — 16 meses de otimização",""],
-           ["EKS Blueprints",N+"EKS-Blueprints-2e7dabadc8df81a0a9c8fcabf9ceb88f"]],
+          [["Retrospectiva da Fase 5 — 3 aprendizados principais",""]]),
+        w("m16w3",63,
+          [["Post-CKS: mapa de certificações — CKS como trampolim para o quê?","https://landscape.cncf.io/"]],
+          [["K8s 1.30+: novas features — Gateway API stable, sidecar containers — impacto","https://kubernetes.io/blog/"]],
+          [["FinOps: revisão anual de custo — 16 meses de otimização — savings medidos",""]],
           [["Reliability annual review: 16 meses de SLOs — tendências e melhorias",""]],
-          [["Post externo: retrospectiva pública da jornada CKS — publicar",""],
-           ["Prática: Mock interviews",N+"Pr-tica-Mock-interviews-2e7dabadc8df8169b73efaed58e1b24b"]]),
-        w("p5w16",64,
+          [["Post externo: retrospectiva pública da jornada CKS — publicar",""]]),
+        w("m16w4",64,
           [["Transição Staff Behavior: gaps identificados para atuar como Staff Engineer",""]],
-          [["Spot/Preemptible instances",N+"Spot-Preemptible-instances-2e7dabadc8df8134b6c0fb2dd86e5c39"],
-           ["Prática: Implementar Karpenter",N+"Pr-tica-Implementar-Karpenter-2e7dabadc8df81948406d2765986a83d"]],
+          [["K8s: explorar features experimentais relevantes para o ambiente actual","https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/"]],
           [["Cloud: Well-Architected review formal do ambiente — relatório completo","https://docs.aws.amazon.com/wellarchitected/latest/userguide/intro.html"]],
-          [["Reliability: programa de SRE — estado atual vs target da Fase 6",""]],
-          [["Retrospectiva expandida da Fase 5 — entrada na Staff Behavior",""],
-           ["Atualizar plano de desenvolvimento",N+"Atualizar-plano-de-desenvolvimento-2e7dabadc8df8104b9b5ce660fdae550"]]),
+          [["Reliability: programa de SRE — estado actual vs target da Fase 6",""]],
+          [["Retrospectiva expandida da Fase 5 — entrada na Staff Behavior",""]]),
       ]},
     ]
   },
-  // ── FASE 6 ── Staff Behavior (Meses 17–18, Semanas 65–72) ────────────────
+
+  // ─── FASE 6 — Staff Behavior (Meses 17–18) ────────────────────────────────
   {
-    id:"p6",num:6,title:"Staff Behavior",period:"Meses 17–18",cert:"→ Staff Orbit",
+    id:"p6", num:6, title:"Staff Behavior", period:"Meses 17–18", weeks_label:"Semanas 65–72",
+    cert:"→ Staff Orbit",
     goal:"Agir como Staff mesmo sem o título. Visibilidade externa. Direção técnica formal.",
     months:[
       { title:"Mês 17", weeks:[
-        w("p6w1",65,
+        w("m17w1",65,
           [["A Philosophy of Software Design cap. 1–5: complexidade como métrica de qualidade","https://web.stanford.edu/~ouster/cgi-bin/book.php"]],
-          [["Crossplane avançado: composições complexas, múltiplos providers","https://docs.crossplane.io/"],
-           ["Kubernetes plugin (Backstage)",N+"Kubernetes-plugin-2e7dabadc8df8178a695d3a76b612a0e"]],
+          [["Crossplane avançado: composições complexas, múltiplos providers","https://docs.crossplane.io/"]],
           [["FinOps avançado: chargeback, showback, otimização por time","https://www.finops.org/framework/"]],
           [["Apresentar métricas DORA + SLOs para liderança como business case",""]],
-          [["Talk externo: submeter proposta para meetup/conferência",""],
-           ["Storytelling técnico",N+"Storytelling-t-cnico-2e7dabadc8df81618605d72b067f1fe2"]]),
-        w("p6w2",66,
+          [["Talk externo: submeter proposta para meetup/conferência",""]]),
+        w("m17w2",66,
           [["A Philosophy of Software Design cap. 6–10: módulos, profundidade vs largura","https://web.stanford.edu/~ouster/cgi-bin/book.php"]],
-          [["IDP: plano de implementação incremental — documento formal","https://platformengineering.org/blog"]],
+          [["IDP: plano de implementação incremental para a empresa — documento formal","https://platformengineering.org/blog"]],
           [["AWS re:Invent: selecione 3 talks de platform/infra e anote insights","https://reinvent.awsevents.com/"]],
           [["AI-driven observability: explorar LLM para análise de anomalias",""]],
-          [["Contribuição open source: PR submetido em projeto relevante",""],
-           ["Prática: PR aceito em projeto relevante",N+"Pr-tica-PR-aceito-em-projeto-relevante-2e7dabadc8df81d39571ec64b19a84f9"]]),
-        w("p6w3",67,
-          [["Technical vision: escreva a visão técnica da plataforma para 2 anos",""]],
-          [["Platform audit: revisão completa do estado atual da plataforma",""]],
+          [["Contribuição open source: PR submetido em projeto relevante",""]]),
+        w("m17w3",67,
+          [["A Philosophy of Software Design: síntese + como aplicar no code review diário","https://web.stanford.edu/~ouster/cgi-bin/book.php"]],
+          [["Platform audit: revisão completa do estado actual da plataforma",""]],
           [["Well-Architected review formal: relatório dos 5 pilares para o ambiente","https://docs.aws.amazon.com/wellarchitected/latest/userguide/intro.html"]],
           [["SLO review semestral: análise de tendências + alertas de longo prazo",""]],
-          [["Networking: conectar com 3 Staff Engineers externos via LinkedIn/Slack","https://staffeng.com/"],
-           ["Technical deep dives",N+"Technical-deep-dives-2e7dabadc8df814a92c7ef20dfd96e52"]]),
-        w("p6w4",68,
-          [["A Philosophy of Software Design: síntese — como aplicar no code review diário","https://web.stanford.edu/~ouster/cgi-bin/book.php"]],
+          [["Networking: conectar com 3 Staff Engineers externos via LinkedIn/Slack","https://staffeng.com/"]]),
+        w("m17w4",68,
+          [["Technical vision: escreva a visão técnica da plataforma para 2 anos",""]],
           [["K8s ecosystem: service mesh comparison — Istio vs Linkerd vs Cilium Mesh","https://servicemesh.es/"]],
-          [["Multi-cloud: trade-offs reais e quando faz sentido",""],
-           ["Data replication strategies",N+"Data-replication-strategies-2e7dabadc8df816eb874f08840905ab5"]],
-          [["Incident review board: criar processo formal de revisão de incidentes",""],
-           ["Prática: Facilitar postmortem",N+"Pr-tica-Facilitar-postmortem-2e7dabadc8df81349207e5ec2386300b"]],
-          [["Liderar: facilitar alignment técnico entre 2 times — plano concreto",""],
-           ["Definir próximos passos carreira",N+"Definir-pr-ximos-passos-carreira-2e7dabadc8df81b79bd8cac047e4ee1d"]]),
+          [["Multi-cloud: trade-offs reais e quando faz sentido para a empresa",""]],
+          [["Incident review board: criar processo formal de revisão de incidentes",""]],
+          [["Liderar: facilitar alignment técnico entre 2 times — plano concreto",""]]),
       ]},
       { title:"Mês 18", weeks:[
-        w("p6w5",69,
+        w("m18w1",69,
           [["A Philosophy of Software Design cap. 11–15: comentários, naming, TDD","https://web.stanford.edu/~ouster/cgi-bin/book.php"]],
           [["Platform Engineering Community: benchmark do que outros times fazem","https://platformengineering.org/blog"]],
           [["Kubeflow: como plataformas suportam workloads de ML","https://www.kubeflow.org/docs/"]],
           [["Reliability at scale: multi-region SLOs e global load balancing patterns",""]],
-          [["Mentoria: 2 engenheiros com sessões regulares e planos formais",""],
-           ["Prática: Mentorar colega em tópico específico",N+"Pr-tica-Mentorar-colega-em-t-pico-espec-fico-2e7dabadc8df81c7afa4d7cd1b5cca0e"]]),
-        w("p6w6",70,
-          [["Organizational design: como plataformas de sucesso são organizadas","https://teamtopologies.com/book"]],
-          [["SRE toil automation: identificar e automatizar top 3 toils atuais","https://sre.google/sre-book/eliminating-toil/"]],
-          [["AI/ML infra: infrastructure patterns para LLM workloads em Kubernetes","https://www.kubeflow.org/"]],
-          [["Reliability: criar processo formal de reliability review para novos serviços",""]],
-          [["Talk externo: submeter segundo abstract para conferência técnica",""],
-           ["Revisar gaps remanescentes",N+"Revisar-gaps-remanescentes-2e7dabadc8df81a4b8d0dcb4f8e8a3b7"]]),
-        w("p6w7",71,
+          [["Mentoria: 2 engenheiros com sessões regulares e planos formais",""]]),
+        w("m18w2",70,
           [["Exercício final: desenhe a arquitetura ideal da plataforma em 3 anos",""]],
           [["Liderar revisão técnica do roadmap de plataforma para o próximo ano",""]],
           [["Revisão de segurança anual: postura atual vs melhores práticas",""]],
           [["Retrospectiva de confiabilidade: 18 meses de SLOs — tendências",""]],
-          [["Retrospectiva da Fase 6 — você está agindo como Staff? O que falta?",""],
-           ["Documentar journey completo",N+"Documentar-journey-completo-2e7dabadc8df8141a2ffde14565e8bc6"]]),
-        w("p6w8",72,
+          [["Retrospectiva da Fase 6 — você está agindo como Staff? O que falta?",""]]),
+        w("m18w3",71,
+          [["Organizational design: como plataformas de sucesso são organizadas","https://teamtopologies.com/book"]],
+          [["SRE toil automation: identificar e automatizar top 3 toils actuais","https://sre.google/sre-book/eliminating-toil/"]],
+          [["AI/ML infra: infrastructure patterns para LLM workloads em Kubernetes","https://www.kubeflow.org/"]],
+          [["Reliability: criar processo formal de reliability review para novos serviços",""]],
+          [["Talk externo: submeter segundo abstract para conferência técnica",""]]),
+        w("m18w4",72,
           [["Retrospectiva dos 18 meses: o que mudou na sua forma de pensar e agir?",""]],
-          [["Platform handoff: documentar runbooks e decisões para continuidade",""]],
+          [["Platform handoff: documentar runbooks e decisões para continuidade do time",""]],
           [["Security: revisão final de postura — entrada na Staff Orbit",""]],
-          [["Observabilidade: revisão final — cobertura e maturidade do sistema atual",""]],
-          [["Celebrar conquistas",N+"Celebrar-conquistas-2e7dabadc8df816396f9e3342fae2d99"],
-           ["Definir metas para próximo ciclo",N+"Definir-metas-para-pr-ximo-ciclo-2e7dabadc8df81f9b694ee690a61dfc2"]]),
+          [["Observabilidade: revisão final — cobertura e maturidade do sistema actual",""]],
+          [["Retrospectiva expandida da Fase 6 — entrada na Staff Orbit",""]]),
       ]},
     ]
   },
-  // ── FASE 7 ── Staff Orbit (Meses 19–36, Semanas 73–144) ──────────────────
+
+  // ─── FASE 7 — Staff Orbit (Meses 19–36) ──────────────────────────────────
   {
-    id:"p7",num:7,title:"Staff Orbit",period:"Meses 19–36",cert:"🌍 Mercado global",
+    id:"p7", num:7, title:"Staff Orbit", period:"Meses 19–36", weeks_label:"Semanas 73–144",
+    cert:"🌍 Mercado global",
     goal:"Escalar a organização via plataforma. Definir direção técnica. Impacto em múltiplos times.",
     months:[
-      { title:"Meses 19–21: Plataforma em Escala", weeks:[
-        w("p7w1",73,
-          [["Organizational mapping: identificar todos os stakeholders de plataforma",""],
-           ["Definir metas para próximo ciclo (3 anos)",N+"Definir-metas-para-pr-ximo-ciclo-2e7dabadc8df81f9b694ee690a61dfc2"]],
+      { title:"Mês 19", weeks:[
+        w("m19w1",73,
+          [["Organizational mapping: identificar todos os stakeholders de plataforma",""]],
           [["eBPF fundamentals: o que é, por que importa para platform engineering","https://ebpf.io/what-is-ebpf/"]],
           [["Platform strategy doc: escrever o 1-pager de estratégia da plataforma",""]],
           [["SLO federation: múltiplos times, 1 dashboard — implementar",""]],
-          [["Mentoria: formalizar estrutura de mentoria para 2 engenheiros",""],
-           ["Prática: Mentorar colega em tópico específico",N+"Pr-tica-Mentorar-colega-em-t-pico-espec-fico-2e7dabadc8df81c7afa4d7cd1b5cca0e"]]),
-        w("p7w2",77,
+          [["Mentoria: formalizar estrutura de mentoria para 2 engenheiros",""]]),
+        w("m19w2",74,
+          [["System design: plataforma interna IDP completa — design do zero","https://platformengineering.org/blog"]],
+          [["eBPF observability: Pixie, Hubble — instrumentação sem agente","https://pixielabs.ai/"]],
+          [["Karpenter avançado: node provisioner, disruption budget, drift detection","https://karpenter.sh/docs/"]],
+          [["Chaos at scale: Game Day com 2+ times envolvidos — facilitar",""]],
+          [["Escrever: post técnico sobre platform engineering na sua empresa",""]]),
+        w("m19w3",75,
+          [["Staff networking: conectar com engenheiros de outras empresas — 3 conversas","https://staffeng.com/"]],
+          [["WASM no K8s: casos de uso, SpinKube, futuro de serverless em K8s","https://spinkube.dev/"]],
+          [["FinOps: implementar tagging strategy completa para chargeback por time",""]],
+          [["Error budget policy: formalizar política formal de error budget para o org","https://sre.google/workbook/error-budget-policy/"]],
+          [["Apresentar: platform strategy para VP Engineering ou equivalente",""]]),
+        w("m19w4",76,
+          [["Retrospectiva Mês 19: progresso vs objetivos Staff — o que ajustar?",""]],
+          [["K8s: Gateway API stable — migrar 1 Ingress para Gateway API em lab","https://kubernetes.io/docs/concepts/services-networking/gateway/"]],
+          [["Security baseline: definir baseline de segurança para toda a plataforma",""]],
+          [["Reliability: criar cultura de confiabilidade além do squad — como?",""]],
+          [["Talk externo: apresentar em meetup local — recolher feedback do público",""]]),
+      ]},
+      { title:"Mês 20", weeks:[
+        w("m20w1",77,
           [["Sociotechnical systems: Team Topologies + arquitetura — aplicar no org","https://teamtopologies.com/book"]],
-          [["Progressive delivery v2: feature flags + Argo Rollouts analysis","https://argoproj.github.io/argo-rollouts/"]],
+          [["Service mesh 2025: comparativo atualizado — qual usar em produção?","https://servicemesh.es/"]],
           [["Platform observability: golden path para observar novos serviços",""]],
           [["SRE at scale: como Google/Meta aplicam SRE — lições aplicáveis","https://sre.google/books/"]],
-          [["Mentoria: expanding — identificar 3º engenheiro para mentorar",""],
-           ["Staff Engineer path vs Management",N+"Staff-Engineer-path-vs-Management-2e7dabadc8df8179afdeec579b9c4824"]]),
-        w("p7w3",81,
-          [["Engineering strategy: como escrever uma engineering strategy eficaz","https://lethain.com/setting-engineering-org-values/"]],
+          [["Mentoria: expanding — identificar 3º engenheiro para mentorar",""]]),
+        w("m20w2",78,
+          [["Technical debt mapping: categorizar e priorizar dívida técnica da plataforma",""]],
+          [["Progressive delivery: Argo Rollouts — canary, blue-green, análise automática","https://argoproj.github.io/argo-rollouts/"]],
+          [["Supply chain: SLSA Level 3 — implementar no pipeline principal","https://slsa.dev/"]],
+          [["SLO-based alerting: unificar alertas em torno de SLOs vs métricas isoladas",""]],
+          [["Engineering blog: publicar post no blog de engenharia da empresa",""]]),
+        w("m20w3",79,
+          [["Platform product metrics: NPS da plataforma, SPACE framework aplicado","https://queue.acm.org/detail.cfm?id=3454124"]],
           [["Cluster fleet management: Fleet, ArgoCD multi-cluster, Cluster API","https://cluster-api.sigs.k8s.io/"]],
+          [["Cloud migration: estratégias lift-and-shift vs cloud-native — ADR formal",""]],
+          [["Incident command: liderar 1 incidente real como incident commander",""]],
+          [["Conference talk: submeter proposta para KubeCon ou conferência equivalente","https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/"]]),
+        w("m20w4",80,
+          [["Retrospectiva Mês 20: ajustes no roadmap Staff — o que está a funcionar?",""]],
+          [["CNI comparison: Cilium vs Calico vs Flannel em prod — ADR fundamentado","https://cilium.io/"]],
+          [["FinOps maturity: avaliar maturidade actual vs FOCUS model","https://focus.finops.org/"]],
+          [["Reliability retrospective: tendências nos últimos 6 meses",""]],
+          [["Comunidade: responder a perguntas técnicas em público (Slack OSS, fórum)",""]]),
+      ]},
+      { title:"Mês 21", weeks:[
+        w("m21w1",81,
+          [["Engineering strategy: como escrever uma engineering strategy eficaz","https://lethain.com/setting-engineering-org-values/"]],
+          [["eBPF security: Tetragon, runtime enforcement, LSM programs","https://tetragon.io/"]],
+          [["Platform API: design da developer API da plataforma — princípios e trade-offs",""]],
+          [["Chaos maturity: avaliar maturidade do programa de chaos engineering","https://principledchaos.org/"]],
+          [["Mentoria coletiva: workshop técnico para 3+ engenheiros — facilitar",""]]),
+        w("m21w2",82,
+          [["Decision making at scale: DACI, RACI — quando usar cada framework",""]],
+          [["K8s networking deep: BGP com Cilium, MetalLB, routing avançado em prod","https://cilium.io/docs/network/bgp-control-plane/"]],
+          [["Zero-trust: implementar mTLS para todos os serviços críticos","https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/"]],
+          [["AIOps: correlação de alertas com ML — explorar Dynatrace Davis ou similar",""]],
+          [["ADR: escolha de service mesh — escrever e partilhar externamente","https://github.com/joelparkerhenderson/architecture-decision-record"]]),
+        w("m21w3",83,
+          [["Organizational patterns: Spotify model — o que funcionou e o que falhou","https://engineering.atspotify.com/"]],
+          [["GitOps at scale: Flux v2 multi-tenancy, isolamento por time","https://fluxcd.io/flux/guides/repository-structure/"]],
           [["Compliance automation: SOC2, ISO27001 — controles como código","https://www.vanta.com/"]],
           [["SLO for business: traduzir SLOs técnicos em impacto de negócio real",""]],
-          [["Liderar: facilitar quarterly planning técnico para o org",""],
-           ["Networking strategy",N+"Networking-strategy-2e7dabadc8df8188bbf3e70d8bc10751"]]),
-        w("p7w4",84,
-          [["Retrospectiva Meses 19–21: impacto medido — o que mudou no org?",""]],
-          [["K8s: deep dive em área específica ainda não dominada","https://landscape.cncf.io/"]],
+          [["Liderar: facilitar quarterly planning técnico para o org — facilitação",""]]),
+        w("m21w4",84,
+          [["Retrospectiva Mês 21 + Sub-fase A (meses 19-21): impacto medido",""]],
+          [["K8s security: KEPs de segurança em desenvolvimento — acompanhar","https://github.com/kubernetes/enhancements"]],
           [["FinOps: showback dashboard para todas as tribos/times da empresa",""]],
           [["Confiabilidade: relatório trimestral para liderança — formato executivo",""]],
-          [["Talk ou publicação: artefato técnico relevante — publicar este mês",""],
-           ["Prática: Publicar artigo",N+"Pr-tica-Publicar-artigo-2e7dabadc8df819ea96de35ee7a46228"]]),
+          [["Talk ou publicação: artefato técnico relevante — publicar este mês",""]]),
       ]},
-      { title:"Meses 22–24: Technical Strategy", weeks:[
-        w("p7w5",85,
+      { title:"Mês 22", weeks:[
+        w("m22w1",85,
+          [["Technical strategy writing: estrutura de uma boa engineering strategy","https://lethain.com/"]],
+          [["Platform engineering tools: Port, Backstage, Cortex — comparativo","https://backstage.io/"]],
+          [["Cloud cost optimization: Savings Plans vs RI — análise para o org","https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html"]],
+          [["Distributed tracing: implementar tracing end-to-end em 2 serviços novos","https://opentelemetry.io/docs/"]],
+          [["Networking: participar em CNCF SIG ou comunidade técnica relevante","https://contribute.cncf.io/"]]),
+        w("m22w2",86,
           [["Technology radar: criar tech radar interno para a empresa","https://www.thoughtworks.com/radar"]],
           [["Kubernetes operators: padrões avançados — level-based vs edge-based","https://book.kubebuilder.io/"]],
           [["Container networking: performance tuning, MTU, eBPF acceleration","https://cilium.io/"]],
           [["SRE Book: releitura com olhar crítico — o que mudou na sua prática?","https://sre.google/sre-book/table-of-contents/"]],
           [["Mentoria: 1 dos mentees está pronto para mentorar outros?",""]]),
-        w("p7w6",89,
+        w("m22w3",87,
+          [["Make vs buy: framework de decisão para novas ferramentas de plataforma",""]],
+          [["WASM + K8s: spin operator, runwasm — casos de uso reais em staging","https://spinkube.dev/"]],
+          [["Identity: SPIFFE/SPIRE em produção — workload identity federation completo","https://spiffe.io/"]],
+          [["Error budget consumption: análise do último trimestre — padrões",""]],
+          [["Apresentação executiva: tech strategy resumida para VP/CTO",""]]),
+        w("m22w4",88,
+          [["Retrospectiva Mês 22: progresso na estratégia técnica — ajustar?",""]],
+          [["Cloud provider roadmap: EKS roadmap — o que priorizar nos próximos 12m","https://github.com/aws/containers-roadmap"]],
+          [["eBPF networking avançado: XDP, TC hooks — performance e segurança","https://ebpf.io/"]],
+          [["Reliability program: expansão para 2 novos times — como facilitar?",""]],
+          [["Open source strategy: qual projeto contribuir para máximo impacto?",""]]),
+      ]},
+      { title:"Mês 23", weeks:[
+        w("m23w1",89,
           [["Platform as product v2: incorporar feedback de 6 meses de métricas",""]],
           [["Cluster lifecycle: upgrade strategy, version skew, canary upgrades em prod","https://kubernetes.io/docs/tasks/administer-cluster/cluster-upgrade/"]],
           [["CSPM: cloud security posture management — implementar Prowler ou Wiz","https://github.com/prowler-cloud/prowler"]],
           [["SLO algebra: combining SLOs, dependencies, composite SLOs","https://sre.google/workbook/implementing-slos/"]],
-          [["Engineering writing: publicar artigo em newsletter técnica relevante",""],
-           ["Escrever blog post técnico",N+"Escrever-blog-post-t-cnico-2e7dabadc8df815b98f0e5210595fc7a"]]),
-        w("p7w7",93,
+          [["Engineering writing: publicar artigo em newsletter técnica relevante",""]]),
+        w("m23w2",90,
+          [["Influence without authority: frameworks para impacto cross-org real","https://staffeng.com/guides/work-on-what-matters/"]],
+          [["Storage at scale: Rook/Ceph, Longhorn, CSI avançado — trade-offs","https://rook.io/docs/rook/latest-release/"]],
+          [["FinOps: análise de anomalia de custo — automatizar detecção com alertas",""]],
+          [["Chaos maturity v2: nível 3 — chaos como parte permanente do SDLC","https://principledchaos.org/"]],
+          [["Mentoria: 1 mentee promovido? Documentar e celebrar o processo",""]]),
+        w("m23w3",91,
+          [["Systems thinking: leverage points, feedback loops na sua organização","https://donellameadows.org/archives/leverage-points-places-to-intervene-in-a-system/"]],
+          [["Multi-arch: ARM64 no K8s — node pools, build pipelines multi-arch","https://aws.amazon.com/ec2/graviton/"]],
+          [["Data sovereignty: GDPR, dados em repouso, encryption key management",""]],
+          [["Reliability: criar processo de reliability review para features novas",""]],
+          [["Talk: apresentar learnings do trimestre para o eng org — all-hands",""]]),
+        w("m23w4",92,
+          [["Retrospectiva Mês 23",""]],
+          [["K8s performance: resource topology, NUMA, huge pages — quando importa?","https://kubernetes.io/docs/tasks/administer-cluster/memory-manager/"]],
+          [["Platform security: pentest da plataforma — contratar ou fazer internamente",""]],
+          [["SLO-based capacity planning: usar SLOs para prever necessidades de scaling",""]],
+          [["Engineering culture: iniciar programa de aprendizado contínuo no squad",""]]),
+      ]},
+      { title:"Mês 24", weeks:[
+        w("m24w1",93,
           [["Strategy review: 6 meses de technical strategy — o que mudou?",""]],
-          [["Progressive delivery v3: Argo Rollouts + feature flags + análise automática","https://argoproj.github.io/argo-rollouts/"]],
+          [["Progressive delivery v2: feature flags, gradual rollout com Argo Rollouts","https://argoproj.github.io/argo-rollouts/"]],
           [["Supply chain: SBOM para toda a plataforma — inventário completo","https://anchore.com/sbom/"]],
-          [["SRE toil: revisão semestral de toil — percentagem de automação atual","https://sre.google/sre-book/eliminating-toil/"]],
-          [["Conference talk: apresentar (se aceite) ou publicar slides + post",""],
-           ["Participar de meetup/conferência",N+"Participar-de-meetup-confer-ncia-2e7dabadc8df819a8938ce2a3de83458"]]),
-        w("p7w8",96,
-          [["Retrospectiva Meses 22–24: 6 meses de Technical Strategy",""]],
-          [["K8s: área ainda não explorada — escolher e estudar profundamente","https://landscape.cncf.io/"]],
+          [["SRE toil: revisão semestral de toil — percentagem de automação actual","https://sre.google/sre-book/eliminating-toil/"]],
+          [["Conference talk: apresentar (se aceite) ou publicar slides + post",""]]),
+        w("m24w2",94,
+          [["Platform roadmap: prioridades para os próximos 12 meses — OKRs alinhados",""]],
+          [["K8s debugging: kubectl debug, ephemeral containers, trace — usar em prod","https://kubernetes.io/docs/tasks/debug/debug-running-pod/"]],
+          [["FinOps: savings de 6 meses documentados — calcular ROI do programa",""]],
+          [["Reliability: análise de incidentes do semestre — padrões e remediações",""]],
+          [["Mentoria: retrospectiva semestral com todos os mentees",""]]),
+        w("m24w3",95,
+          [["Organizational health: como medir saúde do time de plataforma?",""]],
+          [["API gateway: Kong, AWS API GW, Envoy Gateway — comparativo para o ambiente","https://www.envoyproxy.io/"]],
+          [["Compliance: revisão semestral de compliance — gaps e plano de remediação",""]],
+          [["Error budget: revisão semestral — todos os serviços saudáveis?",""]],
+          [["Networking: participar ou co-organizar meetup técnico local",""]]),
+        w("m24w4",96,
+          [["Retrospectiva Mês 24 + Sub-fase B (meses 22-24): 6 meses de Technical Strategy",""]],
+          [["K8s: área ainda não explorada do ecossistema — escolher e estudar","https://landscape.cncf.io/"]],
           [["Cloud architecture: revisão arquitetural anual — Well-Architected full review","https://docs.aws.amazon.com/wellarchitected/latest/userguide/intro.html"]],
           [["Reliability: relatório semestral para liderança — formato executivo",""]],
-          [["Celebrar: milestones alcançados — reconhecer time e mentees",""],
-           ["Celebrar conquistas",N+"Celebrar-conquistas-2e7dabadc8df816396f9e3342fae2d99"]]),
+          [["Celebrar: milestones alcançados — reconhecer time e mentees formalmente",""]]),
       ]},
-      { title:"Meses 25–36: Engineering Excellence e Legado", weeks:[
-        w("p7w9",97,
+      { title:"Mês 25", weeks:[
+        w("m25w1",97,
           [["Platform at scale: lições de empresas que escalam plataformas internas","https://platformengineering.org/blog"]],
-          [["eBPF observability: Pixie, Hubble — instrumentação sem agente","https://pixielabs.ai/"]],
+          [["eBPF networking: XDP programs, TC hooks — performance de networking","https://ebpf.io/"]],
           [["Multi-region active-active: implementar failover real em staging",""]],
           [["Global SLOs: definir SLOs para serviços multi-region",""]],
-          [["Engineering leadership: coaching vs mentoring — quando usar cada um",""],
-           ["Atualizar plano de desenvolvimento",N+"Atualizar-plano-de-desenvolvimento-2e7dabadc8df8104b9b5ce660fdae550"]]),
-        w("p7w10",109,
+          [["Engineering leadership: coaching vs mentoring — quando usar cada um",""]]),
+        w("m25w2",98,
+          [["Developer experience: medir e melhorar DX da plataforma — survey",""]],
+          [["Cluster API: provisionar clusters programaticamente — lab","https://cluster-api.sigs.k8s.io/"]],
+          [["Secret rotation: automatizar rotação de secrets em produção com ESO","https://external-secrets.io/"]],
+          [["Chaos at org scale: Game Day com múltiplos times — facilitar e documentar",""]],
+          [["Case study interno: escrever case study completo da plataforma",""]]),
+        w("m25w3",99,
+          [["Platform economics: custo por developer, ROI de self-service — calcular",""]],
+          [["GitOps: environment per PR — implementar em staging com ArgoCD","https://argo-cd.readthedocs.io/en/stable/"]],
+          [["Vulnerability SLA: definir e medir SLAs de patch por criticidade",""]],
+          [["SRE handbook: criar handbook interno de SRE para a empresa","https://sre.google/workbook/table-of-contents/"]],
+          [["Mentoria: um mentee a assumir responsabilidade técnica maior — delegar",""]]),
+        w("m25w4",100,
+          [["Retrospectiva Mês 25",""]],
+          [["K8s roadmap: KEPs aprovados — o que implementar nos próximos 6m?","https://github.com/kubernetes/enhancements"]],
+          [["FinOps: análise de rightsizing automático — Goldilocks, VPA em prod","https://github.com/FairwindsOps/goldilocks"]],
+          [["Reliability culture: assessment — como está a cultura de confiabilidade?",""]],
+          [["Talk: submeter proposta para KubeCon EU ou US","https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/"]]),
+      ]},
+      { title:"Mês 26", weeks:[
+        w("m26w1",101,
+          [["Platform governance: como escalar decisões técnicas sem criar bottleneck?",""]],
+          [["Service mesh telemetry: Istio + OpenTelemetry + Tempo — stack completo","https://grafana.com/oss/tempo/"]],
+          [["Cost allocation: implementar Kubecost para chargeback por namespace","https://www.kubecost.com/"]],
+          [["SLO-driven development: como times usam SLOs para priorizar trabalho?",""]],
+          [["Engineering blog: série de posts sobre platform engineering — iniciar",""]]),
+        w("m26w2",102,
+          [["Technology lifecycle: como deprecar tecnologias de forma segura",""]],
+          [["Workload identity federation: IRSA avançado, cross-account, multi-cloud","https://aws.github.io/aws-eks-best-practices/security/docs/iam/"]],
+          [["Platform security posture: benchmark vs CIS, NIST CSF","https://www.cisecurity.org/cis-benchmarks"]],
+          [["Incident retrospectives: análise de 12 meses de incidentes — padrões",""]],
+          [["Comunidade: co-organizar evento técnico externo — meetup ou workshop",""]]),
+        w("m26w3",103,
+          [["Platform adoption: medir e aumentar adoção pelos times de produto",""]],
+          [["eBPF observability: criar dashboard de network flows com Hubble","https://github.com/cilium/hubble"]],
+          [["Data compliance: implementar data classification na plataforma",""]],
+          [["SRE maturity: avaliar maturidade SRE do org — scorecard formal","https://dora.dev/"]],
+          [["Mentoria: mentee pronto para liderar iniciativa própria — delegar formalmente",""]]),
+        w("m26w4",104,
+          [["Retrospectiva Mês 26",""]],
+          [["K8s autoscaling: HPA v2, KEDA, custom metrics — quando usar qual?","https://keda.sh/"]],
+          [["FinOps: rightsizing recommendations implementadas — savings medidos",""]],
+          [["Reliability: cultura estabelecida? Medir via survey de todos os times",""]],
+          [["Talk: apresentar case study de platform engineering em evento externo",""]]),
+      ]},
+      { title:"Mês 27", weeks:[
+        w("m27w1",105,
+          [["Organizational resilience: bus factor, knowledge silos — identificar e atacar",""]],
+          [["K8s multi-tenancy: vcluster — virtual clusters por time","https://www.vcluster.com/"]],
+          [["Platform chaos: chaos engineering para a infraestrutura da plataforma",""]],
+          [["SLO evangelism: workshop de SLOs para times que ainda não adotaram",""]],
+          [["Escrita técnica: publicar artigo sobre lessons learned em platform eng",""]]),
+        w("m27w2",106,
+          [["Engineering excellence: architectural fitness functions — como implementar","https://www.oreilly.com/library/view/building-evolutionary-architectures/9781492097532/"]],
+          [["GitOps security: signed commits, verified deployments, audit trail completo","https://sigstore.dev/"]],
+          [["Secrets hygiene: auditoria completa de secrets em todos os repositórios",""]],
+          [["DORA quarterly: calcular métricas para o org todo — benchmark externo","https://dora.dev/research/"]],
+          [["Networking: conectar com comunidade Platform Engineering no Slack","https://platformengineering.org/slack-rd"]]),
+        w("m27w3",107,
+          [["Sociotechnical debt: identificar e atacar dívida técnica organizacional",""]],
+          [["Persistent storage: backup e DR para workloads stateful em K8s — testar","https://velero.io/"]],
+          [["Identity governance: revisar todos os acessos — least privilege audit completo",""]],
+          [["Reliability: processo de capacity planning baseado em SLOs",""]],
+          [["Mentoria: retrospectiva trimestral com todos os mentees",""]]),
+        w("m27w4",108,
+          [["Retrospectiva Mês 27 + Sub-fase C (meses 25-27): Platform at Scale — impacto",""]],
+          [["K8s: explorar 1 área técnica ainda não dominada — escolha sua","https://landscape.cncf.io/"]],
+          [["FinOps: relatório trimestral de custo — tendências e projeções",""]],
+          [["Confiabilidade: relatório trimestral para liderança — formato executivo",""]],
+          [["Contribuição OSS: PR em projeto relevante para a plataforma — merged",""]]),
+      ]},
+      { title:"Mês 28", weeks:[
+        w("m28w1",109,
           [["Engineering principles: escrever os engineering principles do time",""]],
           [["eBPF security v2: CO-RE, BTF, portabilidade — production ready?","https://ebpf.io/"]],
           [["Platform compliance: SOC2 readiness — o que a plataforma cobre?",""]],
           [["SLO review: todos os serviços alinhados com business expectations?",""]],
-          [["Liderar: facilitar engineering all-hands técnico — state of platform",""],
-           ["Technical deep dives",N+"Technical-deep-dives-2e7dabadc8df814a92c7ef20dfd96e52"]]),
-        w("p7w11",121,
+          [["Liderar: facilitar engineering all-hands técnico — state of platform",""]]),
+        w("m28w2",110,
+          [["Staff at scale: como delega technical direction sem ser bottleneck?","https://staffeng.com/"]],
+          [["Service catalog maturity: Backstage — adoption metrics e roadmap","https://backstage.io/"]],
+          [["FinOps automation: anomaly detection, auto-remediation de custo",""]],
+          [["Chaos as a service: times autónomos para executar experimentos",""]],
+          [["Technical leadership principles: escrever e partilhar com o org",""]]),
+        w("m28w3",111,
+          [["Platform health dashboard: criar dashboard de saúde para liderança",""]],
+          [["Container security: runtime enforcement com Tetragon em produção","https://tetragon.io/"]],
+          [["Cloud governance: policies de cloud para o org — preventive controls",""]],
+          [["Incident learning: blameless culture — avaliar e reforçar no org","https://sre.google/sre-book/postmortem-culture/"]],
+          [["Mentoria: mentee a liderar iniciativa — como apoiar sem interferir?",""]]),
+        w("m28w4",112,
+          [["Retrospectiva Mês 28",""]],
+          [["K8s sig updates: acompanhar SIGs relevantes — network, storage, security","https://github.com/kubernetes/community/blob/master/sig-list.md"]],
+          [["Platform security quarterly: revisão trimestral de postura de segurança",""]],
+          [["SRE maturity v2: reavaliação do scorecard — progresso em 3 meses",""]],
+          [["Talk: apresentar em conferência (se aceite) ou escrever recap post",""]]),
+      ]},
+      { title:"Mês 29", weeks:[
+        w("m29w1",113,
+          [["Organizational scaling: como a plataforma escala sem escalar o time?",""]],
+          [["Multi-cluster networking: Cilium ClusterMesh, Submariner — comparar","https://cilium.io/docs/network/clustermesh/"]],
+          [["Zero trust v2: revisar implementação — onde estão os gaps actuais?",""]],
+          [["SLO curriculum: criar treinamento de SLOs para toda a engenharia",""]],
+          [["Networking: aparecer em 1 conferência como palestrante ou attendee",""]]),
+        w("m29w2",114,
+          [["Engineering productivity: medir e melhorar produtividade dos times de produto","https://queue.acm.org/detail.cfm?id=3454124"]],
+          [["K8s scheduler: custom schedulers, DRA — resource management avançado","https://kubernetes.io/docs/concepts/scheduling-eviction/"]],
+          [["FinOps: análise de Reserved Instances — plano de compra anual",""]],
+          [["Reliability: criar SLO para o próprio processo de deploy do squad",""]],
+          [["Mentoria: um mentee a caminho de Staff? Como prepará-lo?","https://staffeng.com/"]]),
+        w("m29w3",115,
+          [["Decision log: criar prática de logging de decisões técnicas no org",""]],
+          [["Platform developer portal: Backstage plugins para workflow completo do dev","https://backstage.io/docs/plugins/create-a-plugin"]],
+          [["Supply chain: SLSA Level 4 — o que falta para atingir o topo?","https://slsa.dev/"]],
+          [["Chaos: análise de 1 ano de Game Days — o que aprendemos?",""]],
+          [["Engineering hiring: participar em hiring loop técnico como avaliador",""]]),
+        w("m29w4",116,
+          [["Retrospectiva Mês 29",""]],
+          [["eBPF: Cilium egress gateway, BGP, L7 policy — features avançadas em prod","https://cilium.io/"]],
+          [["Cost optimization: análise de Graviton/ARM — migração de workloads","https://aws.amazon.com/ec2/graviton/"]],
+          [["SLO: análise de error budget burn do último trimestre — padrões",""]],
+          [["Open source: manter contribuição ativa — 1 PR merged este mês",""]]),
+      ]},
+      { title:"Mês 30", weeks:[
+        w("m30w1",117,
+          [["Platform maturity model: onde a sua plataforma está em maturidade?","https://platformengineering.org/blog"]],
+          [["K8s admission control: CEL validation, ValidatingAdmissionPolicy stable","https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/"]],
+          [["FinOps: análise de spot instance strategy — savings vs risk trade-off",""]],
+          [["Reliability: 30 meses de SLOs — tendências de longo prazo e projeções",""]],
+          [["Mentoria: 1 mentee promovido a senior — documentar a jornada",""]]),
+        w("m30w2",118,
+          [["Technical risk: como identificar e mitigar riscos técnicos no org?",""]],
+          [["Multi-cloud K8s: Crossplane para IaC multi-cloud — production ready?","https://docs.crossplane.io/"]],
+          [["Platform security review semestral: postura vs 6 meses atrás",""]],
+          [["SRE handbook: atualizar com learnings dos últimos 6 meses",""]],
+          [["Escrever: year-in-review técnico — publicar externamente",""]]),
+        w("m30w3",119,
+          [["Succession planning: quem assume as suas responsabilidades se sair?",""]],
+          [["K8s edge: K3s, MicroK8s — edge computing patterns e casos de uso","https://k3s.io/"]],
+          [["Compliance: revisão semestral — novas regulamentações que impactam?",""]],
+          [["Reliability: processo de SLO review escalado para toda a empresa",""]],
+          [["Talk: apresentar year-in-review para o org — all-hands técnico",""]]),
+        w("m30w4",120,
+          [["Retrospectiva Mês 30 + Sub-fase D (meses 28-30): Engineering Excellence",""]],
+          [["K8s: exploração técnica livre — área que ainda intriga e não domina",""]],
+          [["FinOps: relatório anual de cost savings para C-level — ROI total",""]],
+          [["Confiabilidade: relatório anual — 30 meses de programa de SRE",""]],
+          [["Celebrar: marcos alcançados — reconhecer time e mentees formalmente",""]]),
+      ]},
+      { title:"Mês 31", weeks:[
+        w("m31w1",121,
+          [["Engineering organization design: como estruturar times de plataforma?","https://teamtopologies.com/book"]],
+          [["Platform v3: redesign da plataforma baseado em 30 meses de learnings",""]],
+          [["Security culture: como construir security-first mindset no org todo",""]],
+          [["SLO federation: múltiplas unidades de negócio, 1 programa de reliability",""]],
+          [["Liderar: facilitar quarterly technical planning para o org completo",""]]),
+        w("m31w2",122,
+          [["Staff impact measurement: como mede o seu impacto como Staff Engineer?","https://staffeng.com/guides/staff-archetypes/"]],
+          [["K8s future: onde o K8s estará em 3 anos? Construa a sua visão fundamentada",""]],
+          [["FinOps: chargeback implementado — como os times respondem aos custos?",""]],
+          [["Chaos maturity final: programa de chaos como prática contínua estabelecida",""]],
+          [["Mentoria at scale: como mentora através de outros? Multiplicar impacto",""]]),
+        w("m31w3",123,
+          [["Technical leadership at org level: impacto além do seu time direto","https://staffeng.com/"]],
+          [["Plataforma como produto v3: NPS actual, roadmap baseado em feedback",""]],
+          [["Zero trust: revisão anual — implementação completa ou gaps restantes?",""]],
+          [["Reliability: criar SLO para customer experience end-to-end",""]],
+          [["Engineering culture: liderar iniciativa de learning culture no org",""]]),
+        w("m31w4",124,
+          [["Retrospectiva Mês 31",""]],
+          [["K8s: contribuir para KEP ou SIG — participação ativa na comunidade","https://github.com/kubernetes/enhancements"]],
+          [["Security: annual pentest — contratar red team externo para a plataforma",""]],
+          [["SRE: revisão de processos — o que ainda é manual que não deveria ser?",""]],
+          [["Talk: KubeCon EU/US (se aceite) — apresentação ou participação ativa",""]]),
+      ]},
+      { title:"Mês 32", weeks:[
+        w("m32w1",125,
+          [["Organizational debt: dívida organizacional — como identificar e atacar",""]],
+          [["eBPF: contribuir para projeto eBPF open source — issue ou PR","https://ebpf.io/"]],
+          [["Platform economics v2: ROI completo da plataforma — apresentar ao board",""]],
+          [["Reliability: criar programa formal de SRE para a empresa toda",""]],
+          [["Networking: conectar lideranças de platform engineering de outras empresas",""]]),
+        w("m32w2",126,
+          [["Engineering strategy update: revisão da strategy com 6 meses de dados",""]],
+          [["K8s: deep dive em área específica escolhida pela comunidade","https://landscape.cncf.io/"]],
+          [["FinOps: análise de committed use — otimização de longo prazo",""]],
+          [["SLO: publicar SLOs externos para clientes (se aplicável ao produto)",""]],
+          [["Escrita: iniciar rascunho de capítulo ou artigo técnico de longo formato",""]]),
+        w("m32w3",127,
+          [["Organizational culture: como influencia a cultura de engenharia hoje?",""]],
+          [["Platform reliability: implementar chaos para a própria plataforma",""]],
+          [["Cloud native security: cloud native application protection platform",""]],
+          [["Reliability: análise de impacto de negócio de cada SLO activo",""]],
+          [["Mentoria: retrospectiva com todos os mentees — roadmap para o próximo ano",""]]),
+        w("m32w4",128,
+          [["Retrospectiva Mês 32",""]],
+          [["K8s: roadmap — KEPs aprovados para próximas versões — o que implementar?","https://github.com/kubernetes/enhancements"]],
+          [["Security: revisão anual de postura vs 12 meses atrás — delta total",""]],
+          [["SRE: confiabilidade como competitive advantage — business case para liderança",""]],
+          [["Talk ou publicação: artefato técnico relevante — publicar este mês",""]]),
+      ]},
+      { title:"Mês 33", weeks:[
+        w("m33w1",129,
           [["Principal engineer trajectory: Staff → Principal → Distinguished — o caminho","https://staffeng.com/guides/staff-archetypes/"]],
           [["Platform evolution: como a plataforma precisa evoluir nos próximos 12 meses?",""]],
           [["FinOps: análise de custo vs receita — cost center ou profit center?",""]],
           [["Reliability at business level: SLOs mapeados com SLAs para clientes",""]],
-          [["Liderar: facilitar annual technical planning para o ano seguinte",""],
-           ["Definir metas para próximo ciclo",N+"Definir-metas-para-pr-ximo-ciclo-2e7dabadc8df81f9b694ee690a61dfc2"]]),
-        w("p7w12",144,
-          [["3-year retrospective: o que mudou desde o Mês 1?",""]],
+          [["Liderar: facilitar annual technical planning para o ano seguinte",""]]),
+        w("m33w2",130,
+          [["Engineering strategy: escrever strategy para o próximo ano",""]],
+          [["K8s: área experimental — AI Devices plugin, DRA — future features","https://github.com/kubernetes/enhancements"]],
+          [["Supply chain: certificar SLSA compliance para produtos principais","https://slsa.dev/"]],
+          [["SRE: programa expandido — todos os times core cobertos com SLOs?",""]],
+          [["Mentoria: succession planning — quem assume as suas responsabilidades?",""]]),
+        w("m33w3",131,
+          [["Technical legacy: qual legado técnico quer deixar na empresa?",""]],
+          [["Platform handoff: documentar tudo para continuidade — guia completo",""]],
+          [["Security: implementar continuous security validation — policy as code","https://www.openpolicyagent.org/"]],
+          [["Reliability: criar reliability certification para novos serviços",""]],
+          [["Comunidade: organizar trilha técnica em conferência maior",""]]),
+        w("m33w4",132,
+          [["Retrospectiva Mês 33 + Sub-fase E (meses 31-33): Organizational Leadership",""]],
+          [["K8s for AI: GPU operator, MIG, time-slicing — workloads de ML em K8s","https://github.com/NVIDIA/gpu-operator"]],
+          [["FinOps: modelo de FinOps para o próximo ano — apresentar à liderança",""]],
+          [["Confiabilidade: 33 meses de programa — relatório completo de impacto",""]],
+          [["Celebrar: equipe e mentees — reconhecimento formal e público",""]]),
+      ]},
+      { title:"Mês 34", weeks:[
+        w("m34w1",133,
+          [["Distinguished engineer: o que separa Staff de Distinguished/Principal?","https://staffeng.com/"]],
+          [["Platform v4: visão técnica para os próximos 3 anos",""]],
+          [["Security strategy: plano anual de segurança para a empresa — formal",""]],
+          [["Reliability: programa maduro — o que vem a seguir?",""]],
+          [["Networking: apresentar em conferência tier-1 (QCon, P99, KubeCon)",""]]),
+        w("m34w2",134,
+          [["Systems of systems: como plataformas interagem com outras plataformas?",""]],
+          [["K8s: contribuição significativa para projeto da CNCF — PR ou KEP","https://contribute.cncf.io/"]],
+          [["FinOps: criar centro de excelência de FinOps para a empresa","https://www.finops.org/framework/"]],
+          [["SRE at scale: como outras empresas fazem SRE em escala — benchmarking","https://sre.google/books/"]],
+          [["Escrever: publicação técnica de alto impacto — blog da empresa ou artigo",""]]),
+        w("m34w3",135,
+          [["Organizational influence: como move a agulha em larga escala no org?",""]],
+          [["Platform future: AI-native platform engineering — o que muda?",""]],
+          [["Security: threat landscape — como a plataforma está preparada?",""]],
+          [["Reliability: qual é o próximo nível para o programa SRE?",""]],
+          [["Mentoria: um mentee chegou ao Staff? Documentar o processo completo",""]]),
+        w("m34w4",136,
+          [["Retrospectiva Mês 34: 16 meses de Staff Orbit — o que mudou?",""]],
+          [["K8s: análise do ecossistema — onde está a ir nos próximos 3 anos?","https://landscape.cncf.io/"]],
+          [["FinOps: resultados de 3 anos — ROI total calculado e documentado",""]],
+          [["Reliability: programa self-sustaining — funciona sem a sua presença?",""]],
+          [["Talk: submeter proposta para KubeCon do próximo ano",""]]),
+      ]},
+      { title:"Mês 35", weeks:[
+        w("m35w1",137,
+          [["Principal engineering: escreva a sua própria 'operating doc' — como trabalha?","https://lethain.com/staff-engineer-operating-document/"]],
+          [["Platform intelligence: AI-driven platform engineering — implementar 1 caso",""]],
+          [["Security: red team exercise — atacar e melhorar a plataforma",""]],
+          [["SLO: maturidade final — todos os serviços críticos com SLOs definidos?",""]],
+          [["Mentoria: final review de todos os mentees — evoluíram como planeado?",""]]),
+        w("m35w2",138,
+          [["Technical vision 2027: escrever visão técnica de longo prazo — 3 anos",""]],
+          [["K8s: apresentar análise do futuro do K8s para liderança da empresa",""]],
+          [["FinOps: automação completa — custo otimizado sem intervenção manual?",""]],
+          [["Reliability: criar programa de reliability para times de produto",""]],
+          [["Comunidade: co-autoria de artigo ou whitepaper com peers externos",""]]),
+        w("m35w3",139,
+          [["Organizational design final: estrutura ideal para os próximos 2 anos?",""]],
+          [["Platform ecosystem: contribuições ao ecossistema — o que ficou de legado?",""]],
+          [["Security legacy: postura vs 36 meses atrás — delta total documentado",""]],
+          [["Confiabilidade: 35 meses — tendências e projeções para o próximo ciclo",""]],
+          [["Escrever: post final do ciclo — o que aprendeu em 3 anos de Staff Orbit?",""]]),
+        w("m35w4",140,
+          [["Retrospectiva Mês 35",""]],
+          [["K8s: contribuição de legado — o que deixa para a comunidade?",""]],
+          [["FinOps: plano de handoff — quem continua o programa de FinOps?",""]],
+          [["SRE: programa self-sustaining — validação final antes do próximo ciclo",""]],
+          [["Celebrar: 3 anos de jornada — reconhecer todos os envolvidos",""]]),
+      ]},
+      { title:"Mês 36 — Ciclo Completo", weeks:[
+        w("m36w1",141,
+          [["3-year retrospective: o que mudou desde o Mês 1 — comparar o eu de antes?",""]],
+          [["Plataforma: estado actual vs visão inicial — o que foi construído em 3 anos?",""]],
+          [["Security: postura final — relatório completo de 36 meses para a empresa",""]],
+          [["Reliability: programa final — relatório de 36 meses de SRE",""]],
+          [["Comunidade: o que devolve para a comunidade que o formou?",""]]),
+        w("m36w2",142,
+          [["Principal/Distinguished path: próximos passos concretos e plano de ação","https://staffeng.com/"]],
+          [["K8s: expert level — o que ainda não domina? O seu próximo desafio técnico",""]],
+          [["Cloud: o que mudou em cloud em 3 anos? A sua análise para a empresa",""]],
+          [["SRE: futuro do SRE — onde a disciplina está a ir?","https://sre.google/"]],
+          [["Mentoria: todos os mentees em posições mais sénior? Documentar",""]]),
+        w("m36w3",143,
+          [["Career reflection: Staff Engineer em 3 anos — o que mudaria?",""]],
+          [["Platform engineering: futuro da disciplina — a sua visão para 2027+","https://platformengineering.org/"]],
+          [["FinOps: 3 anos de programa — legado e continuidade planeada",""]],
+          [["Reliability: blameless culture estabelecida — como medir e manter?",""]],
+          [["Networking: quem se tornou na comunidade técnica? O seu legado",""]]),
+        w("m36w4",144,
+          [["Visão para o próximo ciclo: o que vem depois dos 36 meses?",""]],
           [["Contribuição final: o que deixa para a próxima geração de engenheiros?",""]],
           [["Cloud native: onde está o ecossistema? Onde está você?",""]],
           [["SRE final: 36 meses de reliability — legado medido e documentado",""]],
-          [["🎯 36 meses completos — reflita, celebre e planeie o próximo capítulo",""],
-           ["Celebrar conquistas",N+"Celebrar-conquistas-2e7dabadc8df816396f9e3342fae2d99"]]),
+          [["🎯 36 meses completos — reflita, celebre e planeie o próximo capítulo",""]]),
       ]},
     ]
   },
 ];
+
+// ─── TROUBLESHOOTING HUB DATA ─────────────────────────────────────────────
+const TROUBLESHOOTING = [
+  {
+    id:"linux", icon:"🐧", title:"Linux Administration", color:"#f59e0b",
+    resources:[
+      { id:"l1",  title:"Linux Server — Complete Administrator's Guide", desc:"Filesystem, user admin, processos, networking e troubleshooting workflows em produção.", tags:["admin","fundamentals","filesystem"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-server-configuration-complete-administrators-guide-beginner-advanced-production-b39e5847e193" },
+      { id:"l2",  title:"Linux User Administration (Practical Guide)", desc:"sudo, PAM authentication, account locking, login auditing, privilege escalation patterns.", tags:["admin","security","sudo"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/linux-user-administration-complete-practical-guide-970fc76c813b" },
+      { id:"l3",  title:"Linux User Administration (Real-World Hands-On)", desc:"Enterprise security: sudoers, PAM, account locking e privilege escalation em ambientes hardened.", tags:["admin","security","sudo"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-user-administration-465fca4c1c52" },
+      { id:"l4",  title:"GRUB Legacy & Boot Process", desc:"Como o Linux arranca — BIOS/UEFI → GRUB → kernel → init. Recovery de sistema não bootável.", tags:["boot","recovery","grub"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/understanding-grub-legacy-grub-conf-in-centos-redhat-b284751a3019" },
+      { id:"l5",  title:"LVM — Practical Guide", desc:"Physical volumes, volume groups, logical volumes, snapshots, resizing e troubleshooting LVM.", tags:["storage","lvm","disk"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/a-practical-guide-to-linux-lvm-logical-volume-management-13ee759081b9" },
+      { id:"l6",  title:"LVM — Complete Guide (Step-by-Step)", desc:"Configuração completa de LVM em Linux passo a passo com Logical Volume Manager.", tags:["storage","lvm","disk"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/learn-how-to-configure-lvm-in-linux-step-by-step-logical-volume-manager-693197b82532" },
+      { id:"l7",  title:"NFS Complete Guide with Installation", desc:"Server e client configuration, export rules, mount options, permissões e fixes de NFS.", tags:["storage","nfs","networking"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/nfs-network-file-system-752584e888a8" },
+      { id:"l8",  title:"FTP Server Setup on Linux", desc:"FTP configuration com security hardening, passive mode, user isolation e troubleshooting.", tags:["ftp","server","networking"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/ftp-server-setup-configuration-on-linux-complete-guide-e24328db41db" },
+      { id:"l9",  title:"Linux Filesystems: Ext2 vs Ext3 vs Ext4 vs XFS", desc:"Quando usar cada filesystem, performance characteristics, e como escolher para o teu workload.", tags:["storage","filesystem","performance"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-file-systems-explained-4869be9e8edf" },
+      { id:"l10", title:"Create a Linux Swap Partition", desc:"Configuração de swap em produção: tamanho, partições, swap files e tuning de swappiness.", tags:["performance","memory","storage"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/create-a-linux-swap-file-swap-partition-steps-1a9d994a0a7a" },
+      { id:"l11", title:"Linux Kernel Tuning", desc:"sysctl production-grade: network stack, memory management, file descriptor limits para high-traffic.", tags:["performance","kernel","tuning"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-kernel-tuning-f888d7f83aab" },
+      { id:"l12", title:"Configuring Sudo Access for Users on RHEL", desc:"sudoers file structure, command whitelisting, logging sudo activity, e fix de sudoers corrompido.", tags:["admin","security","sudo"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/configuring-sudo-access-to-users-4473f995ec40" },
+      { id:"l13", title:"rsync — Practical Examples", desc:"Local e remote sync, incremental backups, bandwidth throttling, exclusions, e backup automation.", tags:["backup","storage","automation"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/10-practical-examples-of-rsync-command-in-linux-780134c2639f" },
+      { id:"l14", title:"100+ DevOps Commands Every Engineer Must Know", desc:"Command reference organizado por categoria: file ops, network, processos, performance analysis.", tags:["fundamentals","reference","commands"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/devops-commands-cheat-sheet-203f9654dede" },
+      { id:"l15", title:"Passwordless SSH Login Setup", desc:"Key-based authentication, authorized_keys, SSH config optimization e common SSH auth failures.", tags:["ssh","security","networking"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/passwordless-ssh-login-using-ssh-key-authentication-11c8d0f0cb63" },
+      { id:"l16", title:"Complete DevOps Cheat Sheet Handbook", desc:"Todos os comandos, flags e atalhos organizados para lookup rápido durante trabalho real.", tags:["fundamentals","reference","commands"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/complete-devops-cheat-sheet-handbook-2ffbedb39857" },
+      { id:"l17", title:"Install mlocate on Linux (CentOS 7)", desc:"Fast file location com mlocate: installation, database building, update scheduling.", tags:["admin","tools","fundamentals"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/how-to-install-mlocate-on-linux-9748035e06b9" },
+      { id:"l18", title:"Installation of Node.js & PM2", desc:"NVM-based installation, PM2 process manager, startup scripts, log management, cluster mode.", tags:["nodejs","installation","tools"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/how-to-install-node-npm-and-pm2-on-linux-d0bd1a03aaac" },
+      { id:"l19", title:"Booting into Single User Mode & Root Recovery", desc:"Recovery de root password perdida em RHEL/CentOS — guia para emergências às 3 da manhã.", tags:["recovery","boot","security"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/booting-into-single-user-mode-on-linux-mounting-root-step-by-step-guide-2512e9597f8c" },
+      { id:"l20", title:"ps Command — Troubleshooting Linux Processes", desc:"Process states, zombie processes, high CPU identification, ps com kill/top/strace para root cause.", tags:["troubleshooting","performance","processes"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/useful-ps-command-to-monitor-and-troubleshoot-linux-process-1eebae69e0ea" },
+      { id:"l21", title:"Fixing Corrupt /etc/sudoers File (Azure VM)", desc:"Recovery sem perder acesso, incluindo abordagem específica para Azure VMs via serial console.", tags:["troubleshooting","recovery","sudo"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/fixing-a-corrupt-etc-sudoers-file-in-linux-vm-in-azure-bb94df88b07d" },
+      { id:"l22", title:"NFS Mount Issues — Troubleshooting Guide", desc:"stale handles, permission denied, timeout, portmap failures — workflow de eliminação completo.", tags:["troubleshooting","nfs","networking"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/nfs-mount-issue-abc776ee7eec" },
+      { id:"l23", title:"Linux Logs Troubleshooting", desc:"/var/log structure, journalctl, log level filtering e os ficheiros que importam por tipo de incidente.", tags:["troubleshooting","logs","debugging"], url:"https://freedium-mirror.cfd/https://medium.com/devops-dev/linux-logs-troubleshooting-fbb7a115cadb" },
+    ]
+  },
+  {
+    id:"webservers", icon:"🌐", title:"Web Servers", color:"#60a5fa",
+    resources:[
+      { id:"w1",  title:"Apache Installation from Tarball (Source Build)", desc:"Compilação from source: compilation flags, dependency management, module selection.", tags:["apache","installation","production"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/apache-tarball-installation-steps-79f883d799ee" },
+      { id:"w2",  title:"Apache CGI-BIN Vulnerability & Fix", desc:"CVE walkthrough real: como CGI-BIN vulnerabilidades são exploradas e configurações que fecham o vetor.", tags:["security","apache","vulnerability"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/apache-cgi-bin-issue-62b22c465b40" },
+      { id:"w3",  title:"Upgrade Apache 2.4.48 → 2.4.53", desc:"Zero-downtime Apache upgrade: backup strategy, dependency checks, rollback plan e validação.", tags:["apache","upgrade","production"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/how-to-upgrade-apache-2-4-48-4187fa4d5f48" },
+      { id:"w4",  title:"HTTP Request Smuggling Fix (ModSecurity + HTTP/2)", desc:"Um dos ataques web mais sofisticados explicado claramente + ModSecurity rule configuration.", tags:["security","apache","vulnerability"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/apache-sop-http-request-smuggling-issue-f65b3729ed72" },
+      { id:"w5",  title:"Apache Hardening — Step-by-Step Security Guide", desc:"Desabilitar módulos desnecessários, security headers, ModSecurity WAF, passar auditorias de segurança.", tags:["security","apache","hardening"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/apache-hardening-445357e9961b" },
+      { id:"w6",  title:"Apache Virtual Hosting (Production Setup)", desc:"Name-based e IP-based virtual hosting: múltiplos domínios num servidor, com logging e SSL por vhost.", tags:["apache","configuration","hosting"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/virtual-hosting-in-apache-web-server-complete-practical-guide-700ca9c56222" },
+      { id:"w7",  title:"Apache Log Format & Log Rotation", desc:"Custom log format, logrotate setup, análise com AWK/grep, basic request monitoring workflow.", tags:["apache","logs","monitoring"], url:"https://freedium-mirror.cfd/https://medium.com/devsecops-community/apache-log-format-and-log-rotatelogs-206fdc0b4537" },
+      { id:"w8",  title:"Apache SSL Certificates — HTTPS Setup Guide", desc:"Certificate procurement, SSL module config, redirect HTTP → HTTPS, renovação, e common SSL errors.", tags:["ssl","security","apache"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/securing-apache-with-ssl-certificate-f8a1277a74a6" },
+      { id:"w9",  title:"NGINX Security Hardening Guide (2026)", desc:"Rate limiting, request size limits, security headers (HSTS, CSP, X-Frame-Options), weak ciphers.", tags:["security","nginx","hardening"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/ultimate-guide-to-securing-nginx-restrict-sensitive-files-protect-endpoints-harden-your-1ed76497faf9" },
+      { id:"w10", title:"Tomcat Server Setup on Linux", desc:"Instalação completa: Java dependencies, Tomcat service management, virtual hosts, manager security.", tags:["tomcat","java","production"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/setup-tomcat-server-on-linux-b056724e4f2d" },
+    ]
+  },
+  {
+    id:"networking", icon:"🔒", title:"Networking & Security", color:"#34d399",
+    resources:[
+      { id:"n1", title:"IPTABLES Firewall — Complete Practical Guide", desc:"De zero a production-ready firewall: chains, tables, stateful filtering, NAT, persistência.", tags:["networking","security","firewall"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/iptables-linux-firewall-complete-practical-guide-d469b3111070" },
+      { id:"n2", title:"Linux Networking Explained", desc:"Networking pelo lens do Linux: interfaces, routing tables, ARP, DNS resolution, socket states.", tags:["networking","linux","fundamentals"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/linux-networking-explained-hardware-drivers-ip-configuration-troubleshooting-step-by-step-1fa1d16d90a2" },
+      { id:"n3", title:"Networking for DevOps — Master the Fundamentals", desc:"TCP/IP, load balancing, DNS, TLS, firewalls, VPCs — networking mapeado para cloud infrastructure.", tags:["networking","fundamentals","cloud"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/networking-for-devops-the-complete-beginner-to-advanced-guide-for-modern-engineers-2cc5be694140" },
+      { id:"n4", title:"Subnet Mask Complete Practical Guide", desc:"CIDR notation, calcular network ranges, design de subnets para AWS VPCs, subnet math.", tags:["networking","aws","fundamentals"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/subnet-masks-reference-table-complete-guide-for-network-admins-devops-bdc9712f0f61" },
+      { id:"n5", title:"Nmap Complete Beginner to Pro Guide", desc:"Host discovery, port scanning, service detection, OS fingerprinting, security audits.", tags:["security","networking","scanning"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/example-of-nmap-network-map-63dda814e33" },
+      { id:"n6", title:"Netstat Explained with Real Use Cases", desc:"Socket e connection analysis, listening ports, connection states, identificar rogue processes.", tags:["networking","troubleshooting","monitoring"], url:"https://freedium-mirror.cfd/https://medium.com/@tushar.jadhav29/example-of-netstat-network-statistics-cc2653cfc004" },
+      { id:"n7", title:"DNS in Very Simple Words", desc:"Como name resolution funciona, record types (A, CNAME, MX, TXT, NS), TTL, debug com dig/nslookup.", tags:["networking","dns","troubleshooting"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/dns-in-very-simple-words-1e0adadf12a8" },
+    ]
+  },
+  {
+    id:"docker", icon:"🐳", title:"Docker", color:"#38bdf8",
+    resources:[
+      { id:"d0", title:"K8s & Docker Mastery Hub (2026 Edition)", desc:"Hub centralizado de Kubernetes e Docker — ponto de entrada para toda a série.", tags:["docker","kubernetes","hub"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/%EF%B8%8F-kubernetes-docker-mastery-hub-2026-edition-a474239b7a21" },
+      { id:"d1", title:"Day 1 — Master Docker Tutorial with Examples", desc:"Containers vs VMs, image e container lifecycle, Dockerfile basics, primeira container image.", tags:["docker","fundamentals","containers"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/docker-installation-setup-and-tutorials-34ab7a6d33b6" },
+      { id:"d2", title:"Day 2 — 50+ Docker Commands with Real-Life Use Cases", desc:"run, exec, logs, inspect, network, volume, compose — cada um com cenário real.", tags:["docker","commands","reference"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/50-docker-commands-every-developer-devops-engineer-should-know-with-examples-real-life-use-f2823110866b" },
+      { id:"d3", title:"Day 3 — Container Volumes in Docker", desc:"Named volumes, bind mounts, tmpfs, volume drivers, backup e patterns para aplicações stateful.", tags:["docker","storage","stateful"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/container-volumes-in-docker-a4755a811d7b" },
+      { id:"d4", title:"Day 4 — Mastering Docker: The Complete Professional Guide", desc:"Multi-stage builds, image optimization, layer caching, security scanning, resource limits, health checks.", tags:["docker","production","optimization"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/mastering-docker-the-complete-professional-guide-fcf021f9ffa1" },
+      { id:"d5", title:"Day 5 — Elastic Stack (ELK) on Docker", desc:"ELK stack com Docker Compose: persistent volumes, resource limits, production-ready config.", tags:["docker","elk","observability"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/elastic-stack-elk-on-docker-daded0183cc6" },
+      { id:"d6", title:"Day 6 — Docker Installation on RHEL 8.8", desc:"Setup Docker em Red Hat-based systems: repositórios, firewall e verificação pós-instalação.", tags:["docker","rhel","installation"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/docker-install-on-rhel-8-8-11722f04d587" },
+      { id:"d7", title:"Docker Alternatives in 2026", desc:"Podman, containerd, nerdctl, Buildah: quando considerar alternativas e o que cada um oferece.", tags:["docker","containers","tooling"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/docker-alternatives-in-2026-d677376a6076" },
+    ]
+  },
+  {
+    id:"kubernetes", icon:"☸️", title:"Kubernetes", color:"#818cf8",
+    resources:[
+      { id:"k0",  title:"K8s & Docker Mastery Hub (2026 Edition)", desc:"Hub centralizado de Kubernetes e Docker — ponto de entrada para toda a série.", tags:["kubernetes","docker","hub"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/%EF%B8%8F-kubernetes-docker-mastery-hub-2026-edition-a474239b7a21" },
+      { id:"k1",  title:"Day 1 — Minikube Installation on CentOS 9", desc:"Local K8s setup: Minikube from scratch no CentOS 9, driver config, resource allocation.", tags:["kubernetes","minikube","installation"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/minikube-installation-on-centos-9-fresh-vm-setup-8a16d4f052af" },
+      { id:"k2",  title:"Day 2 — K8s Fundamentals for Absolute Beginners", desc:"O mental model: control plane, worker nodes, e os core objects (Pod, Deployment, Service, NS).", tags:["kubernetes","fundamentals","architecture"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/kubernetes-fundamentals-for-absolute-beginners-on-aws-cloud-fd94aea5e9e" },
+      { id:"k3",  title:"Day 3 — Kubernetes Explained Simply", desc:"K8s sem jargão: scheduling, Pods, Services — do developer push ao container running.", tags:["kubernetes","fundamentals","beginner"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/kubernetes-explained-simply-a-beginner-friendly-guide-to-cloud-native-scaling-1d173ce58a61" },
+      { id:"k4",  title:"Day 4 — Kubernetes Cheatsheet with Simple Examples", desc:"kubectl commands: apply, get, describe, logs, exec, port-forward, scale, rollout — referência rápida.", tags:["kubernetes","commands","reference"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/kubernetes-cheatsheet-with-simple-examples-for-everyday-use-e659060fc599" },
+      { id:"k5",  title:"Day 5 — Kadira Monitoring Stack", desc:"K8s observability com Kadira: metrics collection, dashboard setup, alerting configuration.", tags:["kubernetes","monitoring","observability"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/kadira-monitoring-stack-production-ready-docker-and-kubernetes-migration-architecture-095de61f9336" },
+      { id:"k6",  title:"Day 6 — Kubernetes Cheat Sheet (Advanced)", desc:"jsonpath queries, custom columns, label selectors, resource quotas, network policy inspection.", tags:["kubernetes","advanced","debugging"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/kubernetes-cheat-sheet-427713ad510" },
+      { id:"k7",  title:"Day 7 — Helm Commands Cheat Sheet", desc:"install, upgrade, rollback, template, values override, e building Helm charts para as tuas apps.", tags:["kubernetes","helm","packaging"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/50-essential-helm-commands-complete-guide-with-examples-history-architecture-real-life-1de3bb8071f1" },
+      { id:"k8",  title:"Kubernetes Auto Scaling with Blue/Green Deployments", desc:"HPA, VPA, blue/green deployment implementation e traffic switching sem downtime.", tags:["kubernetes","scaling","deployments"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/auto-scaling-with-kubernetes-blue-green-deployments-63e196d17cef" },
+      { id:"k9",  title:"K8s on Minikube — TLS + Monitoring + Ingress", desc:"TLS certificate config, Prometheus + Grafana, NGINX Ingress controller — tudo junto num lab.", tags:["kubernetes","monitoring","tls","ingress"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/production-grade-kubernetes-project-on-minikube-b7df47af6b2b" },
+      { id:"k10", title:"Real-World Kubernetes Interview Questions", desc:"Perguntas de entrevistas reais: arquitetura, networking, storage, security, troubleshooting scenarios.", tags:["kubernetes","interview","career"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/real-world-kubernetes-interview-questions-b1b7ff0c69f6" },
+    ]
+  },
+  {
+    id:"databases", icon:"🗄️", title:"Databases", color:"#f472b6",
+    resources:[
+      { id:"db1",  title:"MySQL Master-Master Replication", desc:"Replicação bidirecional: setup, conflict resolution, monitoring, e recovery de split-brain.", tags:["mysql","replication","ha"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/how-to-setup-mysql-master-master-replication-ebfb7348de8f" },
+      { id:"db2",  title:"MySQL Master-Slave Replication", desc:"Replicação clássica, monitoring de lag, promover slave a master, e read scaling.", tags:["mysql","replication","scaling"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/mysql-master-slave-configuration-3cf023102695" },
+      { id:"db3",  title:"MySQL Root Login Error 1045 — Fix", desc:"O MySQL access issue mais comum: diagnóstico, recovery com e sem root access.", tags:["mysql","troubleshooting","security"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/mysql-root-login-issue-197ff1c30c8e" },
+      { id:"db4",  title:"MySQL for Professionals — Production Problems", desc:"Slow query analysis, deadlock diagnosis, replication failures, backup/restore, performance tuning.", tags:["mysql","production","performance"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/mysql-for-professionals-real-world-problems-solutions-advanced-queries-best-practices-57a1ee85b9ba" },
+      { id:"db5",  title:"MySQL Real-World Errors & Solutions", desc:"Coleção de MySQL error codes, o que significam, e os comandos exactos que os resolvem.", tags:["mysql","troubleshooting","reference"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/mysql-db-error-and-solution-867936ffa794" },
+      { id:"db6",  title:"Redis Master Guide: Beginner to Production", desc:"Guia completo de Redis: conceitos, configuração, clustering e padrões de produção.", tags:["redis","fundamentals","production"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/redis-master-guide-from-beginner-to-production-level-engineering-57d3543b980c" },
+      { id:"db7",  title:"Redis Installation & Cluster Setup on Linux", desc:"Redis cluster: node setup, cluster config, testing failover, e client connection patterns.", tags:["redis","cluster","ha"], url:"https://freedium-mirror.cfd/https://medium.com/stackademic/redis-installation-redis-cluster-setup-on-linux-production-guide-6fb8db74cd38" },
+      { id:"db8",  title:"MongoDB Backup Automation", desc:"mongodump automation, oplog-based consistent backups, S3 upload, retention management, restore testing.", tags:["mongodb","backup","automation"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/how-to-write-script-for-mongodb-backup-d9680628a8cb" },
+      { id:"db9",  title:"MongoDB Installation & Replica Set Configuration", desc:"Replica set from scratch: initialization, priority config, arbiters, e testing failover.", tags:["mongodb","replication","ha"], url:"https://freedium-mirror.cfd/https://medium.com/devops-dev/mongodb-installation-replica-set-configuration-on-linux-8913b5e02318" },
+      { id:"db10", title:"Elastic Stack Installation (ELK)", desc:"Elasticsearch, Logstash, e Kibana: installation, integração, index management, log ingestion pipeline.", tags:["elasticsearch","elk","logging"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/elk-installation-step-by-step-b39feb8a9726" },
+      { id:"db11", title:"Backup and Restore Elasticsearch Snapshot", desc:"Snapshot repository (S3/filesystem), scheduling, cross-cluster restore, disaster recovery testing.", tags:["elasticsearch","backup","disaster-recovery"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/backup-and-restore-elasticsearch-snapshot-to-another-cluster-dfe7adc5bf95" },
+      { id:"db12", title:"Apache Kafka Installation", desc:"Kafka from ground up: broker setup, topic creation, producer/consumer config, Kafka concepts.", tags:["kafka","messaging","event-driven"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/apache-kafka-installation-steps-3ed317de6e37" },
+      { id:"db13", title:"Cassandra Database Installation on Linux", desc:"Apache Cassandra setup: installation, cluster config, keyspace e table creation.", tags:["cassandra","nosql","installation"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/cassandra-database-installation-linux-aa88c9327d8b" },
+      { id:"db14", title:"Set Up Kibana from Binary Tarball", desc:"Manual Kibana installation: tarball setup, Elasticsearch connection, index pattern creation.", tags:["kibana","elk","visualization"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/set-up-kibana-from-binary-tarball-77df20fd37d4" },
+      { id:"db15", title:"Installing ArangoDB 3.7 on Linux", desc:"ArangoDB multi-model: installation, config e graph/document/key-value use cases.", tags:["arangodb","nosql","installation"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/step-by-step-guide-installing-arangodb-3-7-on-linux-self-hosted-setup-2bcd1a9f0678" },
+      { id:"db16", title:"Installing Percona Server on Linux", desc:"Percona Server — enhanced MySQL drop-in: installation e performance improvements.", tags:["percona","mysql","performance"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/installing-percona-server-on-red-hat-enterprise-linux-and-centos-92582a9748a" },
+    ]
+  },
+  {
+    id:"cloud", icon:"☁️", title:"Cloud & AWS", color:"#fb923c",
+    resources:[
+      { id:"c1", title:"AWS IAM Implementation Plan", desc:"Users vs roles vs groups, least privilege design, policy structure, e IAM mistakes que criam vulnerabilidades.", tags:["aws","iam","security"], url:"https://freedium-mirror.cfd/https://towardsaws.com/aws-iam-implementation-plan-fba43cc10158" },
+      { id:"c2", title:"AWS Secure Multi-AZ VPC Architecture", desc:"Public/private subnets por AZ, NAT gateways, security groups, NACLs, VPC flow logs.", tags:["aws","vpc","networking","architecture"], url:"https://freedium-mirror.cfd/https://towardsaws.com/aws-secure-multi-az-vpc-architecture-project-897a8ea82b38" },
+      { id:"c3", title:"AWS Auto Scaling — Production-Ready Architecture", desc:"EC2 ASG: launch templates, scaling policies, target tracking, scheduled scaling.", tags:["aws","autoscaling","ec2"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/aws-auto-scaling-production-ready-architecture-setup-guide-8b9f3bc7fbaa" },
+      { id:"c4", title:"AWS EC2 Password Issue — Fix", desc:"EC2 Linux instance password recovery: quando perdes o key pair, EC2 Instance Connect e prevenção.", tags:["aws","ec2","troubleshooting"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/unable-to-retrieve-default-windows-administrator-password-in-aws-ec2-8ad6448e9cc3" },
+      { id:"c5", title:"Azure VM Backup Using Custom Images", desc:"Managed images, image replication entre regiões, deploy from images, automated image lifecycle.", tags:["azure","backup","vm"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/azure-virtual-machine-step-by-step-for-backup-520ed221b471" },
+      { id:"c6", title:"Create User on AWS & Provide Sudo Access Without PPK Key", desc:"AWS user onboarding: IAM users, EC2 Linux user via SSM Session Manager, sudo sem private keys.", tags:["aws","iam","security"], url:"https://freedium-mirror.cfd/https://aws.plainenglish.io/create-read-only-user-on-aws-server-provide-sudo-access-without-ppk-key-aa89bfb869da" },
+      { id:"c7", title:"AWS for DevOps — Ultimate Services Map (2026)", desc:"Todos os serviços AWS que um DevOps engineer precisa, organizados por função com use cases.", tags:["aws","reference","fundamentals"], url:"https://freedium-mirror.cfd/https://medium.com/towards-aws/aws-for-devops-the-ultimate-services-map-cheat-sheets-2026-edition-ad85c581b639" },
+      { id:"c8", title:"AWS CLI Commands Cheat Sheet", desc:"CLI commands diários: EC2, S3, IAM, EKS, RDS, CloudWatch — organizados para lookup rápido.", tags:["aws","cli","reference","commands"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/aws-cli-commands-cheat-sheet-the-ultimate-devops-cloud-engineer-guide-8cd55078cf10" },
+      { id:"c9", title:"DevOps Handbook — 120+ Essential Concepts", desc:"CI/CD, SRE, GitOps, FinOps — o vocabulário que te torna eficaz em conversas com qualquer equipa.", tags:["fundamentals","reference","concepts"], url:"https://freedium-mirror.cfd/https://medium.com/aws-in-plain-english/the-ultimate-devops-handbook-120-essential-concepts-every-engineer-should-know-5eccfcd43307" },
+    ]
+  },
+  {
+    id:"monitoring", icon:"📊", title:"Monitoring & Observability", color:"#a78bfa",
+    resources:[
+      { id:"m1", title:"Complete Guide to Grafana Observability Stack", desc:"Grafana dashboards, Prometheus metrics, Loki logs, Tempo traces — setup e dashboards para incidentes.", tags:["monitoring","grafana","prometheus","observability"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/complete-guide-to-grafana-observability-stack-c3164b66f7ae" },
+      { id:"m2", title:"Grafana + Prometheus + Loki — Complete Stack", desc:"Modern observability: scrape config, Loki log aggregation, Grafana alert rules e runbook-linked alerts.", tags:["monitoring","grafana","loki","prometheus"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/complete-guide-to-grafana-observability-stack-c3164b66f7ae" },
+      { id:"m3", title:"Nagios Setup on Linux", desc:"Server installation, service check configuration, notification setup, monitoring baseline para server fleet.", tags:["monitoring","nagios","alerting"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/nagios-setup-on-linux-268f96064f1d" },
+      { id:"m4", title:"Nagios Client Installation Script (NRPE)", desc:"NRPE agent deployment: installation script, plugin configuration, firewall rules e testing.", tags:["monitoring","nagios","nrpe"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/nagios-client-instalation-script-7d503b769588" },
+      { id:"m5", title:"Monitor Amazon RDS with Nagios", desc:"RDS CloudWatch metric integration, connection count monitoring, storage alerts, replication lag tracking.", tags:["monitoring","aws","rds","nagios"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/monitor-rds-with-nagios-78e3a6fa99c5" },
+    ]
+  },
+  {
+    id:"devops", icon:"🤖", title:"DevOps, IaC & Git", color:"#10b981",
+    resources:[
+      { id:"dv1",  title:"Ansible Made Simple — Beginner Guide", desc:"Installation, inventory, playbooks, modules, variables, e primeira automação a funcionar.", tags:["ansible","automation","iac"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/ansible-made-simple-a-beginner-friendly-guide-with-exampleswhat-is-ansible-dae6623ddb71" },
+      { id:"dv2",  title:"Ansible Real-Life Project — API Error Log Collection", desc:"Projeto Ansible completo: log collection automatizada, parsing de errors, relatório diário.", tags:["ansible","automation","logging"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/ansible-real-life-devops-project-centralized-api-error-log-collection-4c16f9a35b63" },
+      { id:"dv3",  title:"Automating Linux Package Installation with Ansible", desc:"Full stack provisioning: bare OS para configured application server com um playbook.", tags:["ansible","automation","linux"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/automating-linux-packges-instalaltion-stack-setup-with-ansible-6928f8d0b8b4" },
+      { id:"dv4",  title:"Ansible Playbooks — Everyday Use Cases", desc:"Playbooks do dia a dia: padrões práticos para tarefas de automação recorrentes.", tags:["ansible","automation","iac"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/ansible-playbooks-and-m-2f17d3ebee83" },
+      { id:"dv5",  title:"Ansible Production CI/CD with Jenkins & GitHub Actions", desc:"Git push → Jenkins pipeline → Ansible playbook → production deployment.", tags:["ansible","cicd","jenkins"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/ansible-production-ci-cd-with-jenkins-github-actions-59cc16b59adf" },
+      { id:"dv6",  title:"Automate Web App Deployment with Ansible — Zero-Downtime", desc:"Pipeline end-to-end de deployment sem downtime com Ansible.", tags:["ansible","cicd","automation"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/ansible-project-end-to-end-automated-web-application-deployment-525459b467e5" },
+      { id:"dv7",  title:"Terraform for DevOps Engineers", desc:"Primeira config, managing AWS resources, remote state com S3 backend.", tags:["terraform","iac","aws"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/terraform-for-devops-engineers-57f426b7f9cc" },
+      { id:"dv8",  title:"Terraform Made Practical", desc:"Hands-on Terraform: build cloud VMs with code, state management, modules e debugging.", tags:["terraform","iac","aws"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/terraform-made-practical-build-cloud-vms-with-code-and-commands-5d941f011400" },
+      { id:"dv9",  title:"Jenkins Installation & Configuration on Linux", desc:"Production Jenkins: plugins, agent config, pipeline-as-code com Jenkinsfile, security hardening.", tags:["jenkins","cicd","automation"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/jenkins-installation-jenkins-overview-2bdca26450b6" },
+      { id:"dv10", title:"DevSecOps Setup Pipeline and Overview", desc:"SAST/DAST scanning, dependency vulnerability checking, secret scanning, pipeline de segurança.", tags:["devsecops","security","cicd"], url:"https://freedium-mirror.cfd/https://medium.com/devsecops-community/devsecops-overview-72d66c96d7da" },
+      { id:"dv11", title:"Git Tutorial for Beginners", desc:"Mental model de version control, init/clone/commit/push/pull, branching strategy basics.", tags:["git","fundamentals","cicd"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/git-tutorial-for-beginners-8eeab8b41415" },
+      { id:"dv12", title:"Git Essentials — Commands with Real-World Examples", desc:"stash, rebase, cherry-pick, bisect, reflog, reset — cada um com cenário real que salva.", tags:["git","commands","reference"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/git-essentials-the-only-command-cheat-sheet-youll-ever-need-02adc9a75454" },
+      { id:"dv13", title:"Automate System Health Checks in Linux", desc:"Health check automation: disk, memory, CPU, service status, e Slack alerts antes de incidentes.", tags:["automation","bash","monitoring"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/lets-automate-system-health-check-in-linux-9f6ab5bd458" },
+      { id:"dv14", title:"Master YAML for DevOps", desc:"YAML syntax, data types, anchors, multi-line strings — patterns em K8s manifests e CI/CD pipelines.", tags:["yaml","fundamentals","reference"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/master-yaml-for-devops-the-complete-guide-basic-advanced-a444b4aebe68" },
+    ]
+  },
+  {
+    id:"bash", icon:"📜", title:"Bash Scripting", color:"#fbbf24",
+    resources:[
+      { id:"b1", title:"Day 1 — Bash Shell Scripting for Beginners", desc:"Variables, user input, conditionals, loops, functions e o primeiro script de automação completo.", tags:["bash","scripting","fundamentals"], url:"https://freedium-mirror.cfd/https://medium.com/devsecops-community/bash-shell-scripting-complete-beginner-friendly-guide-with-notes-practical-scripts-7c4a304b8897" },
+      { id:"b2", title:"Day 2 — Complete Practical Bash Guide for DevOps", desc:"File operations, string manipulation, arrays, error handling, logging — scripts robustos para cron jobs.", tags:["bash","scripting","automation"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/bash-scripting-day-2-complete-practical-guide-for-devops-scripts-with-full-explanation-671410e57127" },
+      { id:"b3", title:"Day 3 — Advanced Shell Scripting for DevOps", desc:"Argument parsing, config files, locking mechanisms, signal handling — scripts que falham corretamente.", tags:["bash","scripting","advanced"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/bash-scripting-day-3-advanced-shell-scripting-for-devops-dd27fca63a2b" },
+    ]
+  },
+  {
+    id:"projects", icon:"🧑‍💻", title:"DevOps Projects & MLOps", color:"#06b6d4",
+    resources:[
+      { id:"pr1", title:"Magento 2 on Docker — Production-Ready Guide", desc:"E-commerce stack em containers: Magento 2 com MySQL, Elasticsearch, Redis e NGINX on Docker Compose.", tags:["docker","magento","production"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/magento-2-installation-guide-nginx-php-mysql-docker-ready-39bdc786b288" },
+      { id:"pr2", title:"Magento 2 on Kubernetes — Production-Ready Guide", desc:"Magento stack em K8s: persistent volumes, ConfigMaps, Secrets, Ingress, autoscaling.", tags:["kubernetes","magento","production"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/magento-2-on-kubernetes-a-complete-production-ready-guide-298edc68d81a" },
+      { id:"pr3", title:"Build a DevOps Portal", desc:"IDP architecture: tecnologia, abordagem de implementação e self-service DevOps portal.", tags:["idp","platform","project"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/build-a-devops-portal-that-understands-executes-server-commands-automatically-a949364fe87e" },
+      { id:"pr4", title:"osTicket — Complete Setup Guide", desc:"Internal help desk: installation, database config, email integration e production hardening.", tags:["helpdesk","itsm","project"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/osticket-ost-ticket-tool-complete-setup-guide-features-use-cases-e8e909f99072" },
+      { id:"pr5", title:"OpenStack Barbican Setup", desc:"Key Management as a Service: Barbican installation, HSM integration, secret lifecycle management.", tags:["openstack","secrets","security"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/openstack-barbican-secure-secret-key-management-b2aed0bad1b2" },
+      { id:"pr6", title:"MLOps Part 1 — Overview & Top MLOps Tools", desc:"MLOps landscape: MLflow, Kubeflow, BentoML, Seldon — real use cases onde MLOps entrega valor.", tags:["mlops","ai","fundamentals"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/overview-of-mlops-tools-7805b408ef74" },
+      { id:"pr7", title:"MLOps Part 2 — MLOps Roadmap", desc:"Adopção step-by-step: de ad-hoc ML a production ML pipelines com maturity stages.", tags:["mlops","ai","roadmap"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/mlops-road-map-overview-for-beginners-a438f9c399ee" },
+      { id:"pr8", title:"MLOps Part 3 — Getting Started with MLflow", desc:"MLflow hands-on: experiment tracking, model registry, model serving, ML lifecycle management.", tags:["mlops","mlflow","ai"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/mlflow-part-1-getting-started-with-mlflow-7c91aa25ec15" },
+      { id:"pr9", title:"MLOps Part 4 — ML Models into Production Services", desc:"Model deployment: REST API serving, batch inference, A/B testing, monitoring model drift.", tags:["mlops","production","ai"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/mlops-turning-machine-learning-models-into-real-products-e377a6e1ace7" },
+    ]
+  },
+  {
+    id:"career", icon:"🎓", title:"Career & Interviews", color:"#e879f9",
+    resources:[
+      { id:"cr1", title:"DevOps/SRE Interview Preparation Hub — 500+ Questions", desc:"Tudo de Linux basics a SRE mindset: guia completo, single-page, estruturado e gratuito.", tags:["interview","career","sre"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/devops-sre-linux-admin-interview-preparation-hub-2026-edition-500-questions-from-linux-to-17a4843ca234" },
+      { id:"cr2", title:"Linux Interview Questions — Part 1 (Beginner)", desc:"File permissions, process management, system calls, boot sequence — separar juniors de seniors.", tags:["interview","linux","career"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-interview-question-part-1-21ed06c5d72" },
+      { id:"cr3", title:"Linux Interview Questions — Part 2 (Intermediate)", desc:"Networking, performance analysis, memory management, disk I/O, troubleshooting scenarios.", tags:["interview","linux","career"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-interview-question-part-2-9d5c8b13d727" },
+      { id:"cr4", title:"Linux Interview Questions — Part 3 (Advanced)", desc:"Kernel internals, system tuning, security hardening, high-availability patterns.", tags:["interview","linux","career"], url:"https://freedium-mirror.cfd/https://blog.devops.dev/linux-network-and-artificial-intelligence-interview-question-part-3-46c4feee7401" },
+      { id:"cr5", title:"Real-World Kubernetes Interview Questions", desc:"Perguntas de entrevistas reais: arquitetura, networking, storage, security, troubleshooting.", tags:["interview","kubernetes","career"], url:"https://freedium-mirror.cfd/https://blog.stackademic.com/real-world-kubernetes-interview-questions-b1b7ff0c69f6" },
+      { id:"cr6", title:"Terraform Interview Guide (Beginner to Architect)", desc:"De conceitos basicos a state management avancado, modulos, Sentinel policies e multi-cloud.", tags:["interview","terraform","career"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/terraform-interview-guide-beginner-architect-level-f1446e15f064" },
+      { id:"cr7", title:"Linux Admin vs DevOps vs SRE — What's the Difference?", desc:"O que cada role faz day-to-day, responsabilidades, salary ranges, career progression.", tags:["career","sre","fundamentals"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/linux-administration-vs-devops-vs-sre-2025-guide-6a51f2bc3015" },
+      { id:"cr8", title:"200+ Linux Technical Interview Questions (2026)", desc:"O question bank mais abrangente: organizado por topico, com respostas detalhadas e command examples.", tags:["interview","linux","career","reference"], url:"https://freedium-mirror.cfd/https://medium.com/write-a-catalyst/200-linux-technical-interview-questions-answers-2025-edition-b93590d4c3ed" },
+    ]
+  },
+];
+
+
 export default function StudyPlanner() {
   const [activePhase, setActivePhase] = useState("p1");
   const [completed, setCompleted] = useState({});
-  const [expandedWeeks, setExpandedWeeks] = useState({ p1w1: true });
+  const [expandedWeeks, setExpandedWeeks] = useState({ m1w1: true });
   const [loaded, setLoaded] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [view, setView] = useState("planner");
+  const [tsSearch, setTsSearch] = useState("");
+  const [tsCategory, setTsCategory] = useState("all");
 
   useEffect(() => {
-    try {
-      const c = localStorage.getItem("sreplanner-v3-completed");
-      const e = localStorage.getItem("sreplanner-v3-expanded");
-      if (c) setCompleted(JSON.parse(c));
-      if (e) setExpandedWeeks(JSON.parse(e));
-    } catch {}
-    setLoaded(true);
+    (async () => {
+      try { const r = await window.storage.get("sreplanner-v2-completed"); if (r) setCompleted(JSON.parse(r.value)); } catch {}
+      try { const e = await window.storage.get("sreplanner-v2-expanded"); if (e) setExpandedWeeks(JSON.parse(e.value)); } catch {}
+      setLoaded(true);
+    })();
   }, []);
 
-  const save = (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} };
-  const toggleItem = (id) => { const n={...completed,[id]:!completed[id]}; setCompleted(n); save("sreplanner-v3-completed",n); };
-  const toggleWeek = (id) => { const n={...expandedWeeks,[id]:!expandedWeeks[id]}; setExpandedWeeks(n); save("sreplanner-v3-expanded",n); };
+  const saveCompleted = async (next) => { try { await window.storage.set("sreplanner-v2-completed", JSON.stringify(next)); } catch {} };
+  const saveExpanded  = async (next) => { try { await window.storage.set("sreplanner-v2-expanded",  JSON.stringify(next)); } catch {} };
+
+  const toggleItem = (id) => { const n = {...completed, [id]: !completed[id]}; setCompleted(n); saveCompleted(n); };
+  const toggleWeek = (id) => { const n = {...expandedWeeks, [id]: !expandedWeeks[id]}; setExpandedWeeks(n); saveExpanded(n); };
 
   const expandAll = () => {
-    const phase = PHASES.find(p=>p.id===activePhase);
-    const n={...expandedWeeks};
-    phase.months.forEach(m=>m.weeks.forEach(wk=>{n[wk.id]=true;}));
-    setExpandedWeeks(n); save("sreplanner-v3-expanded",n);
+    const phase = PHASES.find(p => p.id === activePhase);
+    const n = {...expandedWeeks};
+    phase.months.forEach(m => m.weeks.forEach(wk => { n[wk.id] = true; }));
+    setExpandedWeeks(n); saveExpanded(n);
   };
   const collapseAll = () => {
-    const phase = PHASES.find(p=>p.id===activePhase);
-    const n={...expandedWeeks};
-    phase.months.forEach(m=>m.weeks.forEach(wk=>{n[wk.id]=false;}));
-    setExpandedWeeks(n); save("sreplanner-v3-expanded",n);
+    const phase = PHASES.find(p => p.id === activePhase);
+    const n = {...expandedWeeks};
+    phase.months.forEach(m => m.weeks.forEach(wk => { n[wk.id] = false; }));
+    setExpandedWeeks(n); saveExpanded(n);
   };
 
-  const allItems = PHASES.flatMap(p=>p.months.flatMap(m=>m.weeks.flatMap(wk=>DAYS.flatMap(d=>wk.days[d.key]||[]))));
+  const allItems = PHASES.flatMap(p => p.months.flatMap(m => m.weeks.flatMap(wk => DAYS.flatMap(d => wk.days[d.key] || []))));
   const totalItems = allItems.length;
-  const completedCount = allItems.filter(i=>completed[i.id]).length;
-  const overallPct = totalItems>0 ? Math.round((completedCount/totalItems)*100) : 0;
+  const completedCount = allItems.filter(i => completed[i.id]).length;
+  const overallPct = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
 
-  const getPStats = (phase) => {
-    const items = phase.months.flatMap(m=>m.weeks.flatMap(wk=>DAYS.flatMap(d=>wk.days[d.key]||[])));
-    const done = items.filter(i=>completed[i.id]).length;
-    return { done, total:items.length, pct: items.length>0 ? Math.round((done/items.length)*100) : 0 };
-  };
-  const getWStats = (week) => {
-    const items = DAYS.flatMap(d=>week.days[d.key]||[]);
-    const done = items.filter(i=>completed[i.id]).length;
-    return { done, total:items.length, pct: items.length>0 ? Math.round((done/items.length)*100) : 0 };
+  const getPhaseStats = (phase) => {
+    const items = phase.months.flatMap(m => m.weeks.flatMap(wk => DAYS.flatMap(d => wk.days[d.key] || [])));
+    const done = items.filter(i => completed[i.id]).length;
+    return { done, total: items.length, pct: items.length > 0 ? Math.round((done / items.length) * 100) : 0 };
   };
 
-  const currentPhase = PHASES.find(p=>p.id===activePhase);
-  const pc = PC[activePhase];
+  const getWeekStats = (week) => {
+    const items = DAYS.flatMap(d => week.days[d.key] || []);
+    const done = items.filter(i => completed[i.id]).length;
+    return { done, total: items.length, pct: items.length > 0 ? Math.round((done / items.length) * 100) : 0 };
+  };
+
+  const currentPhase = PHASES.find(p => p.id === activePhase);
+  const phaseColor = PC[activePhase];
 
   if (!loaded) return (
-    <div style={{background:"#0c0c0e",height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:"#475569",fontFamily:"monospace"}}>
+    <div style={{ background: "#0c0c0e", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569", fontFamily: "monospace" }}>
       Carregando planner...
     </div>
   );
 
   return (
-    <div style={{fontFamily:"'IBM Plex Mono','Fira Code',monospace",background:"#0c0c0e",minHeight:"100vh",color:"#e2e8f0",display:"flex",height:"100vh",overflow:"hidden"}}>
+    <div style={{ fontFamily: "'IBM Plex Mono', 'Fira Code', monospace", background: "#0c0c0e", minHeight: "100vh", color: "#e2e8f0", display: "flex", height: "100vh", overflow: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Sora:wght@600;700&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0;}
-        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#2a2a32;border-radius:3px;}
-        .pb:hover{background:rgba(255,255,255,0.04)!important;}
-        .wh:hover{background:#1a1a22!important;}
-        .ir:hover{background:rgba(255,255,255,0.03)!important;}
-        .lb:hover{opacity:1!important;}
-        .cb:hover{background:#1e1e28!important;}
-        .sb{width:220px;min-width:220px;background:#0d0d11;border-right:1px solid #1a1a22;display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease;flex-shrink:0;}
-        .wg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
-        .sbo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;}
-        .hb{display:none;align-items:center;justify-content:center;width:32px;height:32px;background:#141418;border:1px solid #222228;border-radius:6px;cursor:pointer;color:#94a3b8;font-size:16px;flex-shrink:0;}
-        @media(max-width:900px){.wg{grid-template-columns:repeat(3,1fr)!important;}}
-        @media(max-width:768px){
-          .sb{position:fixed;left:0;top:0;height:100vh;z-index:100;transform:translateX(-100%);}
-          .sb.open{transform:translateX(0);}
-          .sbo.open{display:block;}
-          .hb{display:flex;}
-          .wg{grid-template-columns:repeat(2,1fr)!important;}
-        }
-        @media(max-width:480px){.wg{grid-template-columns:1fr!important;}}
-        .notion-badge{display:inline-flex;align-items:center;gap:3px;font-size:8px;padding:1px 4px;background:#ffffff08;border:1px solid #ffffff15;border-radius:3px;color:#888;margin-left:4px;vertical-align:middle;}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #2a2a32; border-radius: 3px; }
+        .phase-btn:hover { background: rgba(255,255,255,0.04) !important; }
+        .week-hdr:hover { background: #1a1a22 !important; }
+        .item-row:hover { background: rgba(255,255,255,0.03) !important; }
+        .link-btn:hover { opacity: 1 !important; }
+        .ctrl-btn:hover { background: #1e1e28 !important; }
       `}</style>
 
-      {/* Sidebar overlay (mobile) */}
-      <div className={`sbo${sidebarOpen?" open":""}`} onClick={()=>setSidebarOpen(false)}/>
-
       {/* Sidebar */}
-      <div className={`sb${sidebarOpen?" open":""}`}>
-        <div style={{padding:"18px 14px 14px",borderBottom:"1px solid #1a1a22"}}>
-          <div style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"#f59e0b",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:2}}>Platform Eng.</div>
-          <div style={{fontFamily:"'Sora',sans-serif",fontSize:10,fontWeight:600,color:"#475569",marginBottom:14}}>Staff Roadmap · 3 Anos</div>
-          <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#475569",marginBottom:5}}>
+      <div style={{ width: 220, minWidth: 220, background: "#0d0d11", borderRight: "1px solid #1a1a22", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ padding: "18px 14px 14px", borderBottom: "1px solid #1a1a22" }}>
+          <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 11, fontWeight: 700, color: "#f59e0b", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 2 }}>Platform Eng.</div>
+          <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 11, fontWeight: 600, color: "#475569", letterSpacing: "0.06em", marginBottom: 14 }}>Roadmap 3 Anos · 144 Semanas</div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#475569", marginBottom: 5 }}>
             <span>Progresso total</span>
-            <span style={{color:"#f59e0b",fontWeight:600}}>{overallPct}%</span>
+            <span style={{ color: "#f59e0b", fontWeight: 600 }}>{overallPct}%</span>
           </div>
-          <div style={{height:3,background:"#1a1a22",borderRadius:2}}>
-            <div style={{height:"100%",background:"linear-gradient(90deg,#f59e0b,#fbbf24)",borderRadius:2,width:`${overallPct}%`,transition:"width .5s ease"}}/>
+          <div style={{ height: 3, background: "#1a1a22", borderRadius: 2 }}>
+            <div style={{ height: "100%", background: "linear-gradient(90deg,#f59e0b,#fbbf24)", borderRadius: 2, width: `${overallPct}%`, transition: "width 0.5s ease" }} />
           </div>
-          <div style={{fontSize:10,color:"#334155",marginTop:5}}>{completedCount}/{totalItems} itens</div>
+          <div style={{ fontSize: 10, color: "#334155", marginTop: 5 }}>{completedCount} / {totalItems} itens</div>
         </div>
-        <div style={{flex:1,overflowY:"auto",paddingTop:4}}>
-          {PHASES.map(phase=>{
-            const s=getPStats(phase);
-            const isA=phase.id===activePhase;
-            const c=PC[phase.id];
+        <div style={{ flex: 1, overflowY: "auto", paddingTop: 4 }}>
+          {PHASES.map(phase => {
+            const stats = getPhaseStats(phase);
+            const isActive = phase.id === activePhase;
+            const color = PC[phase.id];
             return (
-              <div key={phase.id} className="pb"
-                onClick={()=>{setActivePhase(phase.id);if(window.innerWidth<=768)setSidebarOpen(false);}}
-                style={{padding:"9px 14px",borderLeft:`3px solid ${isA?c:"transparent"}`,background:isA?`${c}12`:"transparent",cursor:"pointer",transition:"all .2s"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}}>
-                  <span style={{fontSize:10,fontWeight:600,color:isA?c:"#64748b"}}>FASE {phase.num}</span>
-                  <span style={{fontSize:10,color:s.pct===100?"#22c55e":"#475569"}}>{s.pct}%</span>
+              <div key={phase.id} className="phase-btn"
+                onClick={() => setActivePhase(phase.id)}
+                style={{ padding: "9px 14px", borderLeft: `3px solid ${isActive ? color : "transparent"}`, background: isActive ? `${color}12` : "transparent", cursor: "pointer", transition: "all 0.2s" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: isActive ? color : "#64748b" }}>FASE {phase.num}</span>
+                  <span style={{ fontSize: 10, color: stats.pct === 100 ? "#22c55e" : "#475569" }}>{stats.pct}%</span>
                 </div>
-                <div style={{fontSize:12,color:isA?"#f1f5f9":"#64748b",fontWeight:500,marginBottom:2}}>{phase.title}</div>
-                <div style={{fontSize:10,color:"#334155",marginBottom:6}}>{phase.period}</div>
-                <div style={{height:2,background:"#1a1a22",borderRadius:1}}>
-                  <div style={{height:"100%",borderRadius:1,background:c,width:`${s.pct}%`,opacity:isA?1:0.4,transition:"width .4s ease"}}/>
+                <div style={{ fontSize: 12, color: isActive ? "#f1f5f9" : "#64748b", fontWeight: 500, marginBottom: 2 }}>{phase.title}</div>
+                <div style={{ fontSize: 10, color: "#334155", marginBottom: 6 }}>{phase.period}</div>
+                <div style={{ height: 2, background: "#1a1a22", borderRadius: 1 }}>
+                  <div style={{ height: "100%", borderRadius: 1, background: color, width: `${stats.pct}%`, opacity: isActive ? 1 : 0.4, transition: "width 0.4s ease" }} />
                 </div>
               </div>
             );
@@ -967,97 +1324,108 @@ export default function StudyPlanner() {
       </div>
 
       {/* Main */}
-      <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
-        {/* Header */}
-        <div style={{padding:"14px 20px",borderBottom:"1px solid #1a1a22",background:"#0f0f14",flexShrink:0}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <button className="hb" onClick={()=>setSidebarOpen(o=>!o)}>☰</button>
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-                  <span style={{padding:"2px 8px",background:`${pc}18`,border:`1px solid ${pc}35`,borderRadius:4,fontSize:10,color:pc,fontWeight:600}}>FASE {currentPhase.num} · {currentPhase.period}</span>
-                  <span style={{padding:"2px 8px",background:"#141418",border:"1px solid #222228",borderRadius:4,fontSize:10,color:"#64748b"}}>{currentPhase.cert}</span>
-                </div>
-                <div style={{fontFamily:"'Sora',sans-serif",fontSize:17,fontWeight:700,color:"#f1f5f9",marginBottom:4}}>{currentPhase.title}</div>
-                <div style={{fontSize:11,color:"#475569",maxWidth:580}}>{currentPhase.goal}</div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+        {/* ── Tab switcher ── */}
+        <div style={{ display: "flex", gap: 0, borderBottom: "1px solid #1a1a22", background: "#0a0a0e", flexShrink: 0, padding: "0 20px" }}>
+          {[
+            { id: "planner",        label: "📚 Planner",         subtitle: "144 semanas" },
+            { id: "troubleshooting",label: "🔧 Troubleshooting", subtitle: "referência rápida" },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setView(tab.id)} style={{
+              padding: "10px 18px", background: "transparent", border: "none", borderBottom: `2px solid ${view === tab.id ? "#f59e0b" : "transparent"}`,
+              color: view === tab.id ? "#f1f5f9" : "#475569", cursor: "pointer", fontSize: 12, fontWeight: view === tab.id ? 600 : 400,
+              fontFamily: "inherit", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6,
+            }}>
+              {tab.label}
+              <span style={{ fontSize: 9, color: view === tab.id ? "#64748b" : "#2a2a38", fontWeight: 400 }}>{tab.subtitle}</span>
+            </button>
+          ))}
+        </div>
+
+        {view === "planner" ? (<>
+        {/* ── Planner header ── */}
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid #1a1a22", background: "#0f0f14", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ padding: "2px 8px", background: `${phaseColor}18`, border: `1px solid ${phaseColor}35`, borderRadius: 4, fontSize: 10, color: phaseColor, fontWeight: 600 }}>FASE {currentPhase.num} · {currentPhase.period}</span>
+                <span style={{ padding: "2px 8px", background: "#141418", border: "1px solid #222228", borderRadius: 4, fontSize: 10, color: "#64748b" }}>{currentPhase.cert}</span>
               </div>
+              <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: "#f1f5f9", marginBottom: 4 }}>{currentPhase.title}</div>
+              <div style={{ fontSize: 11, color: "#475569", maxWidth: 580 }}>{currentPhase.goal}</div>
             </div>
-            <div style={{display:"flex",gap:6,flexShrink:0}}>
-              <button className="cb" onClick={expandAll} style={{padding:"5px 12px",fontSize:10,color:"#94a3b8",background:"#141418",border:"1px solid #222228",borderRadius:5,cursor:"pointer"}}>↓ Expandir tudo</button>
-              <button className="cb" onClick={collapseAll} style={{padding:"5px 12px",fontSize:10,color:"#94a3b8",background:"#141418",border:"1px solid #222228",borderRadius:5,cursor:"pointer"}}>↑ Recolher tudo</button>
+            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+              <button className="ctrl-btn" onClick={expandAll} style={{ padding: "5px 12px", fontSize: 10, color: "#94a3b8", background: "#141418", border: "1px solid #222228", borderRadius: 5, cursor: "pointer" }}>↓ Expandir tudo</button>
+              <button className="ctrl-btn" onClick={collapseAll} style={{ padding: "5px 12px", fontSize: 10, color: "#94a3b8", background: "#141418", border: "1px solid #222228", borderRadius: 5, cursor: "pointer" }}>↑ Recolher tudo</button>
             </div>
           </div>
-          <div style={{display:"flex",gap:6,marginTop:12,flexWrap:"wrap"}}>
-            {DAYS.map(d=>(
-              <div key={d.key} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 8px",background:"#0d0d11",border:"1px solid #1a1a22",borderRadius:20,fontSize:10}}>
-                <span>{d.icon}</span><span style={{color:d.color,fontWeight:500}}>{d.label}</span><span style={{color:"#334155"}}>—</span><span style={{color:"#475569"}}>{d.tag}</span>
+          <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
+            {DAYS.map(d => (
+              <div key={d.key} style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", background: "#0d0d11", border: "1px solid #1a1a22", borderRadius: 20, fontSize: 10 }}>
+                <span>{d.icon}</span><span style={{ color: d.color, fontWeight: 500 }}>{d.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Content */}
-        <div style={{flex:1,overflowY:"auto",padding:"16px 20px"}}>
-          {currentPhase.months.map(month=>(
-            <div key={month.title} style={{marginBottom:28}}>
-              <div style={{fontSize:10,fontWeight:600,color:"#334155",letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:10,paddingBottom:8,borderBottom:"1px solid #141418"}}>
+        {/* ── Planner content ── */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+          {currentPhase.months.map((month) => (
+            <div key={month.title} style={{ marginBottom: 28 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "#334155", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 10, paddingBottom: 8, borderBottom: "1px solid #141418" }}>
                 ◆ {month.title}
               </div>
-              {month.weeks.map(week=>{
-                const ws=getWStats(week);
-                const isExp=expandedWeeks[week.id];
-                const allDone=ws.total>0&&ws.done===ws.total;
+              {month.weeks.map((week) => {
+                const stats = getWeekStats(week);
+                const isExpanded = expandedWeeks[week.id];
+                const allDone = stats.total > 0 && stats.done === stats.total;
                 return (
-                  <div key={week.id} style={{marginBottom:6,border:`1px solid ${isExp?"#1e1e2a":"#161620"}`,borderRadius:8,overflow:"hidden",background:"#0f0f14"}}>
-                    <div className="wh" onClick={()=>toggleWeek(week.id)}
-                      style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",cursor:"pointer",background:isExp?"#141418":"transparent",transition:"background .15s"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:10}}>
-                        <div style={{width:26,height:26,borderRadius:5,background:allDone?"#16532d":isExp?`${pc}1a`:"#161620",border:`1px solid ${allDone?"#22c55e40":isExp?`${pc}40`:"#1e1e28"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:600,color:allDone?"#22c55e":isExp?pc:"#475569"}}>
-                          {allDone?"✓":week.num}
+                  <div key={week.id} style={{ marginBottom: 6, border: `1px solid ${isExpanded ? "#1e1e2a" : "#161620"}`, borderRadius: 8, overflow: "hidden", background: "#0f0f14" }}>
+                    <div className="week-hdr" onClick={() => toggleWeek(week.id)}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", cursor: "pointer", background: isExpanded ? "#141418" : "transparent", transition: "background 0.15s" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 26, height: 26, borderRadius: 5, background: allDone ? "#16532d" : isExpanded ? `${phaseColor}1a` : "#161620", border: `1px solid ${allDone ? "#22c55e40" : isExpanded ? `${phaseColor}40` : "#1e1e28"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: allDone ? "#22c55e" : isExpanded ? phaseColor : "#475569" }}>
+                          {allDone ? "✓" : week.num}
                         </div>
                         <div>
-                          <span style={{fontSize:12,color:isExp?"#e2e8f0":"#64748b",fontWeight:500}}>Semana {week.num}</span>
-                          {ws.done>0&&<span style={{fontSize:10,color:allDone?"#22c55e":"#64748b",marginLeft:8}}>{ws.done}/{ws.total}</span>}
+                          <span style={{ fontSize: 12, color: isExpanded ? "#e2e8f0" : "#64748b", fontWeight: 500 }}>Semana {week.num}</span>
+                          {stats.done > 0 && <span style={{ fontSize: 10, color: allDone ? "#22c55e" : "#64748b", marginLeft: 8 }}>{stats.done}/{stats.total}</span>}
                         </div>
                       </div>
-                      <div style={{display:"flex",alignItems:"center",gap:10}}>
-                        <div style={{width:60,height:2,background:"#1a1a22",borderRadius:1}}>
-                          <div style={{height:"100%",borderRadius:1,background:allDone?"#22c55e":pc,width:`${ws.pct}%`,transition:"width .3s ease"}}/>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 60, height: 2, background: "#1a1a22", borderRadius: 1 }}>
+                          <div style={{ height: "100%", borderRadius: 1, background: allDone ? "#22c55e" : phaseColor, width: `${stats.pct}%`, transition: "width 0.3s ease" }} />
                         </div>
-                        <span style={{fontSize:10,color:"#2a2a38"}}>{isExp?"▲":"▼"}</span>
+                        <span style={{ fontSize: 10, color: "#2a2a38" }}>{isExpanded ? "▲" : "▼"}</span>
                       </div>
                     </div>
-                    {isExp&&(
-                      <div className="wg" style={{padding:"0 12px 12px"}}>
-                        {DAYS.map(day=>{
-                          const items=week.days[day.key]||[];
-                          const dayDone=items.filter(i=>completed[i.id]).length;
+                    {isExpanded && (
+                      <div style={{ padding: "0 12px 12px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
+                        {DAYS.map(day => {
+                          const items = week.days[day.key] || [];
+                          const dayDone = items.filter(i => completed[i.id]).length;
                           return (
-                            <div key={day.key} style={{background:"#0b0b10",border:"1px solid #161620",borderTop:`2px solid ${day.color}25`,borderRadius:6,padding:"10px 8px"}}>
-                              <div style={{fontSize:10,fontWeight:600,color:day.color,marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                            <div key={day.key} style={{ background: "#0b0b10", border: "1px solid #161620", borderTop: `2px solid ${day.color}25`, borderRadius: 6, padding: "10px 8px" }}>
+                              <div style={{ fontSize: 10, fontWeight: 600, color: day.color, marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <span>{day.icon} {day.label}</span>
-                                {items.length>0&&<span style={{opacity:.5}}>{dayDone}/{items.length}</span>}
+                                {items.length > 0 && <span style={{ opacity: 0.5 }}>{dayDone}/{items.length}</span>}
                               </div>
-                              {items.map(item=>{
-                                const done=completed[item.id];
-                                const isNotion=item.url&&item.url.includes("notion.so");
+                              {items.map(item => {
+                                const done = completed[item.id];
                                 return (
-                                  <div key={item.id} className="ir"
-                                    style={{display:"flex",alignItems:"flex-start",gap:6,marginBottom:5,padding:"5px 5px",borderRadius:5,background:done?"#0a1f13":"transparent",border:`1px solid ${done?"#16532d30":"transparent"}`,cursor:"pointer",transition:"background .15s"}}
-                                    onClick={()=>toggleItem(item.id)}>
-                                    <div style={{width:13,height:13,borderRadius:3,border:`1.5px solid ${done?"#22c55e":"#2a2a38"}`,background:done?"#22c55e":"transparent",flexShrink:0,marginTop:2,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .15s"}}>
-                                      {done&&<span style={{fontSize:8,color:"#000",fontWeight:700}}>✓</span>}
+                                  <div key={item.id} className="item-row"
+                                    style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 5, padding: "5px 5px", borderRadius: 5, background: done ? "#0a1f13" : "transparent", border: `1px solid ${done ? "#16532d30" : "transparent"}`, cursor: "pointer", transition: "background 0.15s" }}
+                                    onClick={() => toggleItem(item.id)}>
+                                    <div style={{ width: 13, height: 13, borderRadius: 3, border: `1.5px solid ${done ? "#22c55e" : "#2a2a38"}`, background: done ? "#22c55e" : "transparent", flexShrink: 0, marginTop: 1, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
+                                      {done && <span style={{ fontSize: 8, color: "#000", fontWeight: 700 }}>✓</span>}
                                     </div>
-                                    <div style={{flex:1,minWidth:0}}>
-                                      <div style={{fontSize:10,color:done?"#334155":"#8892a4",lineHeight:1.5,textDecoration:done?"line-through":"none",transition:"all .15s",wordBreak:"break-word"}}>
-                                        {item.text}
-                                        {isNotion&&<span className="notion-badge">N</span>}
-                                      </div>
-                                      {item.url&&(
-                                        <a href={item.url} target="_blank" rel="noopener noreferrer"
-                                          onClick={e=>e.stopPropagation()} className="lb"
-                                          style={{fontSize:9,color:isNotion?"#a855f7":day.color,opacity:.55,textDecoration:"none",marginTop:2,display:"inline-block",transition:"opacity .15s"}}>
-                                          {isNotion?"→ Notion":"→ recurso"}
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ fontSize: 10, color: done ? "#334155" : "#8892a4", lineHeight: 1.5, textDecoration: done ? "line-through" : "none", transition: "all 0.15s" }}>{item.text}</div>
+                                      {item.url && (
+                                        <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="link-btn"
+                                          style={{ fontSize: 9, color: day.color, opacity: 0.55, textDecoration: "none", marginTop: 2, display: "inline-block", transition: "opacity 0.15s" }}>
+                                          → recurso
                                         </a>
                                       )}
                                     </div>
@@ -1075,6 +1443,82 @@ export default function StudyPlanner() {
             </div>
           ))}
         </div>
+        </>) : (<>
+
+        {/* ── Troubleshooting header ── */}
+        <div style={{ padding: "14px 20px", borderBottom: "1px solid #1a1a22", background: "#0f0f14", flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <input
+              value={tsSearch} onChange={e => setTsSearch(e.target.value)}
+              placeholder="🔍  Pesquisar recurso, tag ou tecnologia..."
+              style={{ flex: 1, minWidth: 200, padding: "7px 12px", background: "#141418", border: "1px solid #222228", borderRadius: 6, color: "#e2e8f0", fontSize: 11, fontFamily: "inherit", outline: "none" }}
+            />
+            <div style={{ fontSize: 10, color: "#334155", whiteSpace: "nowrap" }}>
+              {(() => {
+                const q = tsSearch.toLowerCase();
+                const total = TROUBLESHOOTING.flatMap(c => c.resources).filter(r =>
+                  tsCategory === "all" || r.tags.some(t => t === tsCategory) || TROUBLESHOOTING.find(c => c.id === tsCategory)?.resources.includes(r)
+                ).filter(r => !q || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || r.tags.some(t => t.includes(q))).length;
+                return `${total} recursos`;
+              })()}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 5, marginTop: 10, flexWrap: "wrap" }}>
+            {[{ id: "all", label: "Todos", icon: "⚡" }, ...TROUBLESHOOTING.map(c => ({ id: c.id, label: c.title, icon: c.icon, color: c.color }))].map(cat => (
+              <button key={cat.id} onClick={() => setTsCategory(cat.id)} style={{
+                padding: "3px 10px", fontSize: 10, fontFamily: "inherit", cursor: "pointer", borderRadius: 20,
+                background: tsCategory === cat.id ? (cat.color ? `${cat.color}20` : "#f59e0b20") : "#141418",
+                border: `1px solid ${tsCategory === cat.id ? (cat.color || "#f59e0b") + "50" : "#222228"}`,
+                color: tsCategory === cat.id ? (cat.color || "#f59e0b") : "#475569",
+                transition: "all 0.15s",
+              }}>
+                {cat.icon} {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Troubleshooting content ── */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+          {(() => {
+            const q = tsSearch.toLowerCase();
+            const cats = tsCategory === "all" ? TROUBLESHOOTING : TROUBLESHOOTING.filter(c => c.id === tsCategory);
+            return cats.map(cat => {
+              const filtered = cat.resources.filter(r =>
+                !q || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || r.tags.some(t => t.includes(q))
+              );
+              if (!filtered.length) return null;
+              return (
+                <div key={cat.id} style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "#334155", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid #141418", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{cat.icon}</span>
+                    <span style={{ color: cat.color }}>{cat.title}</span>
+                    <span style={{ color: "#1e1e28" }}>· {filtered.length} recursos</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 8 }}>
+                    {filtered.map(r => (
+                      <a key={r.id} href={r.url} target="_blank" rel="noopener noreferrer"
+                        style={{ display: "block", textDecoration: "none", padding: "12px 14px", background: "#0f0f14", border: "1px solid #1a1a22", borderLeft: `3px solid ${cat.color}`, borderRadius: 7, transition: "all 0.15s", cursor: "pointer" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "#141418"; e.currentTarget.style.borderColor = cat.color + "60"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "#0f0f14"; e.currentTarget.style.borderColor = "#1a1a22"; e.currentTarget.style.borderLeftColor = cat.color; }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: "#e2e8f0", marginBottom: 5, lineHeight: 1.4 }}>{r.title}</div>
+                        <div style={{ fontSize: 10, color: "#475569", lineHeight: 1.5, marginBottom: 8 }}>{r.desc}</div>
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                          {r.tags.map(tag => (
+                            <span key={tag} onClick={e => { e.preventDefault(); setTsSearch(tag); }} style={{ padding: "1px 7px", background: `${cat.color}12`, border: `1px solid ${cat.color}25`, borderRadius: 10, fontSize: 9, color: cat.color, cursor: "pointer" }}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+        </>)}
       </div>
     </div>
   );
