@@ -1221,14 +1221,14 @@ export default function StudyPlanner() {
 
   useEffect(() => {
     (async () => {
-      try { const r = await window.storage.get("sreplanner-v2-completed"); if (r) setCompleted(JSON.parse(r.value)); } catch {}
-      try { const e = await window.storage.get("sreplanner-v2-expanded"); if (e) setExpandedWeeks(JSON.parse(e.value)); } catch {}
+        try { const c = localStorage.getItem("sreplanner-completed"); if (c) setCompleted(JSON.parse(c)); } catch {}
+        try { const e = localStorage.getItem("sreplanner-expanded");  if (e) setExpandedWeeks(JSON.parse(e)); } catch {}
       setLoaded(true);
     })();
   }, []);
 
-  const saveCompleted = async (next) => { try { await window.storage.set("sreplanner-v2-completed", JSON.stringify(next)); } catch {} };
-  const saveExpanded  = async (next) => { try { await window.storage.set("sreplanner-v2-expanded",  JSON.stringify(next)); } catch {} };
+  const saveCompleted = (next) => { try { localStorage.setItem("sreplanner-completed", JSON.stringify(next)); } catch {} };
+  const saveExpanded  = (next) => { try { localStorage.setItem("sreplanner-expanded",  JSON.stringify(next)); } catch {} };
 
   const toggleItem = (id) => { const n = {...completed, [id]: !completed[id]}; setCompleted(n); saveCompleted(n); };
   const toggleWeek = (id) => { const n = {...expandedWeeks, [id]: !expandedWeeks[id]}; setExpandedWeeks(n); saveExpanded(n); };
