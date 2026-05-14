@@ -1210,6 +1210,193 @@ const TROUBLESHOOTING = [
 ];
 
 
+
+// ─── KNOWLEDGE BASE DATA ──────────────────────────────────────────────────
+const KB = [
+  {
+    id:"kb-cka", icon:"☸️", title:"CKA", color:"#f59e0b",
+    resources:[
+      { id:"kc1",  title:"REALIZAR EXAME CKA",                       desc:"Exame prático 2h, 15-20 tarefas no terminal, score mínimo 66%. Requer CKA curriculum.",                                    url:"https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/" },
+      { id:"kc2",  title:"Killer.sh mock exams",                      desc:"2 simulações mais difíceis que o exame real. 36h de acesso, ambiente idêntico ao exame.",                                   url:"https://killer.sh/" },
+      { id:"kc3",  title:"ETCD backup e restore",                     desc:"etcdctl snapshot save/restore, flags obrigatórias (--endpoints, --cacert, --cert, --key), restart cluster após restore.",   url:"https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/" },
+      { id:"kc4",  title:"Cluster upgrades com kubeadm",              desc:"kubeadm upgrade plan → apply; drain + upgrade kubelet/kubectl por node; uncordon após.",                                    url:"https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/" },
+      { id:"kc5",  title:"Cluster maintenance",                       desc:"kubectl drain (evict pods com --ignore-daemonsets), cordon (unschedulable), uncordon; PodDisruptionBudgets.",               url:"https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/" },
+      { id:"kc6",  title:"Certificados e componentes do control plane",desc:"kube-apiserver, controller-manager, scheduler, etcd; TLS bootstrapping, certificate rotation, kubeadm certs.",            url:"https://kubernetes.io/docs/concepts/architecture/" },
+      { id:"kc7",  title:"Network Policies em profundidade",          desc:"Ingress/Egress rules, podSelector, namespaceSelector, ipBlock; default deny all; CNI compatibility (Calico, Cilium).",     url:"https://kubernetes.io/docs/concepts/services-networking/network-policies/" },
+      { id:"kc8",  title:"Ingress Controllers (NGINX, Traefik)",      desc:"IngressClass, path types (Prefix/Exact), TLS termination, annotations por controller, múltiplos controllers.",              url:"https://kubernetes.io/docs/concepts/services-networking/ingress/" },
+      { id:"kc9",  title:"RBAC: Roles, ClusterRoles, ServiceAccounts",desc:"Role (namespace) vs ClusterRole (cluster-wide); Bindings; aggregation rules; kubectl auth can-i --as.",                    url:"https://kubernetes.io/docs/reference/access-authn-authz/rbac/" },
+      { id:"kc10", title:"Debugging pods, nodes, networking",         desc:"kubectl describe/logs/exec/events; node conditions; CrashLoopBackOff, Pending, OOMKilled — root cause workflow.",            url:"https://kubernetes.io/docs/tasks/debug/debug-application/" },
+      { id:"kc11", title:"StatefulSets e Headless Services",          desc:"Stable network IDs (pod-0, pod-1), ordered deploy/delete, volumeClaimTemplates, headless (clusterIP: None).",               url:"https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" },
+      { id:"kc12", title:"PersistentVolumes, PVCs, StorageClasses",   desc:"PV lifecycle, access modes (RWO/ROX/RWX), reclaim policies, dynamic provisioning via StorageClass e CSI drivers.",          url:"https://kubernetes.io/docs/concepts/storage/persistent-volumes/" },
+      { id:"kc13", title:"Namespaces e Resource Quotas",              desc:"Namespace isolation, ResourceQuota (CPU/mem/objects count), LimitRange (default requests/limits per container).",             url:"https://kubernetes.io/docs/concepts/policy/resource-quotas/" },
+      { id:"kc14", title:"Comparação: Push vs Pull-based deployments", desc:"Push: CI pipeline aplica diretamente no cluster. Pull: GitOps operator (ArgoCD/Flux) reconcilia do repo continuamente.",   url:"https://opengitops.dev/" },
+    ]
+  },
+  {
+    id:"kb-ckad", icon:"📦", title:"CKAD", color:"#60a5fa",
+    resources:[
+      { id:"kd1",  title:"REALIZAR EXAME CKAD",                       desc:"Exame prático 2h, ~19 tarefas, foco em Application Design, Build, Deploy, Observability e Services.",                       url:"https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/" },
+      { id:"kd2",  title:"Speed drills para kubectl",                  desc:"Aliases (k=kubectl), --dry-run=client -o yaml, explain, -o jsonpath, completion; velocidade é crítica no exame.",           url:"https://kubernetes.io/docs/reference/kubectl/cheatsheet/" },
+      { id:"kd3",  title:"Multi-container patterns",                   desc:"Sidecar (log shipper), Ambassador (proxy externo), Adapter (format transformer) — quando usar cada pattern.",               url:"https://kubernetes.io/docs/concepts/workloads/pods/" },
+      { id:"kd4",  title:"Init containers",                            desc:"Executam sequencialmente antes do app, uso para setup/migrations/wait-for-deps; restartPolicy separado.",                   url:"https://kubernetes.io/docs/concepts/workloads/pods/init-containers/" },
+      { id:"kd5",  title:"Jobs e CronJobs",                            desc:"completions, parallelism, backoffLimit, ttlSecondsAfterFinished; CronJob schedule, concurrencyPolicy, startingDeadline.",    url:"https://kubernetes.io/docs/concepts/workloads/controllers/job/" },
+      { id:"kd6",  title:"Rolling updates, Recreate",                  desc:"maxSurge + maxUnavailable, kubectl rollout history/undo/status; Recreate para apps que não suportam múltiplas versões.",    url:"https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" },
+      { id:"kd7",  title:"Canary releases",                            desc:"Múltiplos Deployments com labels diferentes, Service selector aponta para ambos; split por réplicas (90/10).",              url:"https://kubernetes.io/docs/concepts/cluster-administration/managing-resources/" },
+      { id:"kd8",  title:"Blue/Green deployments",                     desc:"Dois Deployments em paralelo (blue=prod, green=new); switch instantâneo alterando Service selector; rollback imediato.",    url:"https://argo-cd.readthedocs.io/en/stable/user-guide/deployments/" },
+      { id:"kd9",  title:"HPA, VPA, KEDA",                             desc:"HPA: CPU/mem ou custom metrics; VPA: right-sizing automático; KEDA: event-driven (queues, crons, external metrics).",      url:"https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/" },
+      { id:"kd10", title:"Probes: liveness, readiness, startup",       desc:"liveness reinicia pod; readiness remove do LB; startup protege slow-start; tipos HTTP/TCP/exec/gRPC.",                      url:"https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/" },
+      { id:"kd11", title:"Resource management (requests/limits)",      desc:"requests = scheduling guarantee; limits = enforcement; QoS classes: Guaranteed, Burstable, BestEffort; OOMKiller.",         url:"https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" },
+      { id:"kd12", title:"ConfigMaps e Secrets best practices",        desc:"envFrom, volume mounts, immutable, secretKeyRef; NEVER commit secrets em git; ESO para produção.",                          url:"https://kubernetes.io/docs/concepts/configuration/secret/" },
+      { id:"kd13", title:"Multi-stage builds otimizados",              desc:"FROM ... AS builder, COPY --from=builder, minimizar layers, cache busting strategies, .dockerignore.",                      url:"https://docs.docker.com/build/guide/multi-stage/" },
+      { id:"kd14", title:"Distroless e minimal images",                desc:"gcr.io/distroless — sem shell, sem package manager, reduz attack surface e image size significativamente.",                 url:"https://github.com/GoogleContainerTools/distroless" },
+      { id:"kd15", title:"Container security scanning (Trivy)",        desc:"trivy image, --severity HIGH,CRITICAL, integração CI/CD, --exit-code 1 para quality gates, SBOM generation.",              url:"https://aquasecurity.github.io/trivy/" },
+      { id:"kd16", title:"Canary com ArgoCD Rollouts",                 desc:"Argo Rollouts CRD, rollout strategy: canary steps com setWeight, analysis templates, pause/promote/abort.",                 url:"https://argoproj.github.io/argo-rollouts/" },
+    ]
+  },
+  {
+    id:"kb-cks", icon:"🔒", title:"CKS", color:"#ef4444",
+    resources:[
+      { id:"ks1",  title:"REALIZAR EXAME CKS",                         desc:"Exame prático 2h, requer CKA válida. Domínios: Cluster Setup/Hardening, Supply Chain, Monitoring, Runtime Security.",     url:"https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/" },
+      { id:"ks2",  title:"CIS Benchmarks para Kubernetes",             desc:"kube-bench executa automated CIS checks: apiserver flags, etcd encryption, scheduler, kubelet configuration.",             url:"https://www.cisecurity.org/benchmark/kubernetes" },
+      { id:"ks3",  title:"RBAC avançado e audit logging",              desc:"Least privilege, audit policy levels (None/Metadata/Request/RequestResponse), audit backends (log file, webhook).",        url:"https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/" },
+      { id:"ks4",  title:"API Server security",                        desc:"--anonymous-auth=false, --authorization-mode=Node,RBAC, admission plugins, --tls-min-version, --encryption-provider-config.",url:"https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/" },
+      { id:"ks5",  title:"Node security",                              desc:"Minimizar packages, desabilitar serviços desnecessários, SSH hardening, AppArmor profiles, seccomp enforcement.",           url:"https://kubernetes.io/docs/concepts/security/" },
+      { id:"ks6",  title:"Security contexts avançados",                desc:"runAsNonRoot, runAsUser, allowPrivilegeEscalation: false, readOnlyRootFilesystem, capabilities: drop: [ALL].",             url:"https://kubernetes.io/docs/tasks/configure-pod-container/security-context/" },
+      { id:"ks7",  title:"Pod-to-Pod encryption",                      desc:"mTLS via service mesh (Istio PeerAuthentication STRICT), SPIFFE/SPIRE workload identity, certificate auto-rotation.",      url:"https://istio.io/latest/docs/concepts/security/" },
+      { id:"ks8",  title:"OPA/Gatekeeper policies",                    desc:"ConstraintTemplate (Rego logic), Constraint CRD (instances), enforcement: deny/warn/dryrun, audit violations.",            url:"https://open-policy-agent.github.io/gatekeeper/website/docs/" },
+      { id:"ks9",  title:"Kyverno como alternativa",                   desc:"Policies em YAML nativo (sem Rego), mutate/validate/generate, ClusterPolicy vs Policy, background scan.",                  url:"https://kyverno.io/docs/introduction/" },
+      { id:"ks10", title:"Pod Security Standards enforcement",         desc:"Restricted/Baseline/Privileged profiles; namespace labels (enforce/audit/warn); Pod Security Admission controller.",       url:"https://kubernetes.io/docs/concepts/security/pod-security-standards/" },
+      { id:"ks11", title:"HashiCorp Vault deep dive",                  desc:"Secrets engines (KV, PKI, database), auth methods, policies, leases, dynamic secrets, K8s auth backend.",                  url:"https://developer.hashicorp.com/vault/docs" },
+      { id:"ks12", title:"Vault + External Secrets Operator",          desc:"ESO SecretStore/ClusterSecretStore, ExternalSecret → K8s Secret sync, refresh interval, secret transformation.",           url:"https://external-secrets.io/latest/" },
+      { id:"ks13", title:"Falco para detecção de ameaças",             desc:"eBPF-based rules engine, built-in rules (shell in container, privilege escalation), falcosidekick alerting.",              url:"https://falco.org/docs/" },
+      { id:"ks14", title:"Image signing e verification (Cosign)",      desc:"cosign sign/verify, keyless signing via OIDC, policy enforcement com Connaisseur ou Kyverno ClusterPolicy.",               url:"https://docs.sigstore.dev/" },
+      { id:"ks15", title:"SBOM (Software Bill of Materials)",          desc:"Syft gera SBOM (SPDX/CycloneDX format), Grype faz vulnerability scan no SBOM, integrar em CI pipeline.",                  url:"https://anchore.com/blog/what-is-an-sbom/" },
+      { id:"ks16", title:"Seccomp e AppArmor",                         desc:"seccomp: syscall filtering (RuntimeDefault vs Localhost profile); AppArmor: MAC para processos em container.",             url:"https://kubernetes.io/docs/tutorials/security/seccomp/" },
+      { id:"ks17", title:"Validating admission webhooks",              desc:"MutatingAdmissionWebhook e ValidatingAdmissionWebhook, caBundle inject, failurePolicy: Fail/Ignore, timeoutSeconds.",      url:"https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/" },
+      { id:"ks18", title:"Linux security primitives",                  desc:"Namespaces (PID/net/mount/user isolation), cgroups (resource limits), capabilities (privilege granularity).",              url:"https://man7.org/linux/man-pages/man7/namespaces.7.html" },
+    ]
+  },
+  {
+    id:"kb-gitops", icon:"🔄", title:"GitOps", color:"#10b981",
+    resources:[
+      { id:"kg1",  title:"Princípios GitOps",                          desc:"Declarativo, versionado em Git, pulled automaticamente, continuamente reconciliado — OpenGitOps v1.0 spec.",               url:"https://opengitops.dev/" },
+      { id:"kg2",  title:"Setup inicial ArgoCD",                       desc:"kubectl apply -k, port-forward, argocd CLI login, initial admin password, app-of-apps pattern bootstrap.",                  url:"https://argo-cd.readthedocs.io/en/stable/getting_started/" },
+      { id:"kg3",  title:"Applications, Projects, ApplicationSets",    desc:"Application CRD, AppProject RBAC isolation, ApplicationSet generators: cluster, git, matrix, list, SCM provider.",          url:"https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/" },
+      { id:"kg4",  title:"Sync policies e health checks",              desc:"syncPolicy: automated (prune: true, selfHeal: true), resource health checks, ignoreDifferences, sync options.",             url:"https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/" },
+      { id:"kg5",  title:"Hooks e Sync Waves",                         desc:"PreSync/Sync/PostSync/SyncFail hooks, argocd.argoproj.io/hook, wave annotation para ordering de recursos.",                url:"https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/" },
+      { id:"kg6",  title:"SSO e RBAC no ArgoCD",                       desc:"OIDC/Dex integration, argocd-rbac-cm policies (p, g), project roles, JWT tokens, group sync.",                             url:"https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/" },
+      { id:"kg7",  title:"Comparação ArgoCD vs Flux",                  desc:"ArgoCD: UI-first, app-of-apps pattern; Flux: CLI-first, source/kustomize/helm controllers, multi-tenancy nativo.",          url:"https://fluxcd.io/flux/" },
+      { id:"kg8",  title:"Arquitetura Flux",                           desc:"Source Controller, Kustomize Controller, Helm Controller, Notification Controller, Image Automation Controller.",           url:"https://fluxcd.io/flux/concepts/" },
+      { id:"kg9",  title:"GitRepository, HelmRelease, Kustomization",  desc:"Flux CRDs: GitRepository (source), Kustomization (apply with prune), HelmRelease (install/upgrade lifecycle).",            url:"https://fluxcd.io/flux/guides/" },
+      { id:"kg10", title:"Kustomize vs Helm",                          desc:"Kustomize: overlay-based sem templating, built-in kubectl. Helm: templating + packaging + lifecycle (install/upgrade/rollback).", url:"https://kustomize.io/" },
+      { id:"kg11", title:"Overlays, patches, transformers",            desc:"base/ + overlays/{dev,prod}/, strategic merge patch, JSON patch 6902, namePrefix/nameSuffix, configMapGenerator.",         url:"https://kubectl.docs.kubernetes.io/references/kustomize/" },
+      { id:"kg12", title:"Helm + GitOps patterns",                     desc:"Umbrella charts, OCI registries (helm push), values por environment, helm diff plugin, helmfile para multi-release.",      url:"https://helm.sh/docs/" },
+      { id:"kg13", title:"Chart development best practices",           desc:"_helpers.tpl, named templates, NOTES.txt, values schema (values.schema.json), helm lint, helm template.",                  url:"https://helm.sh/docs/chart_best_practices/" },
+      { id:"kg14", title:"Image automation (Flux)",                    desc:"ImageRepository scan registry, ImagePolicy semver filter, ImageUpdateAutomation commit manifest updates to git.",           url:"https://fluxcd.io/flux/guides/image-update/" },
+      { id:"kg15", title:"GitHub Actions / GitLab CI para GitOps",     desc:"Build → push image → update manifests (kustomize set image / helm bump) → commit → PR → ArgoCD auto-sync.",              url:"https://docs.github.com/en/actions" },
+    ]
+  },
+  {
+    id:"kb-obs", icon:"📊", title:"Observability", color:"#a78bfa",
+    resources:[
+      { id:"ko1",  title:"Observability vs Monitoring",                desc:"Monitoring: known unknowns (alertas pré-definidos). Observability: unknown unknowns via high-cardinality events.",          url:"https://opentelemetry.io/docs/concepts/observability-primer/" },
+      { id:"ko2",  title:"SLIs, SLOs, SLAs e Error Budgets",          desc:"SLI: medição real de reliability; SLO: target (99.9%); SLA: contrato; Error Budget = 1 - SLO (tempo para inovar).",        url:"https://sre.google/sre-book/service-level-objectives/" },
+      { id:"ko3",  title:"Google SRE Book (capítulos-chave)",          desc:"Cap 1-6: SRE philosophy e Embracing Risk. Cap 10-15: Practical alerting, On-call, Incidents, Postmortems.",               url:"https://sre.google/sre-book/table-of-contents/" },
+      { id:"ko4",  title:"Arquitetura e data model Prometheus",        desc:"Pull-based scraping, TSDB local, labels (cardinality!), federation, remote_write para long-term storage (Thanos/Cortex).",  url:"https://prometheus.io/docs/introduction/overview/" },
+      { id:"ko5",  title:"PromQL básico e intermediário",              desc:"rate(), irate(), histogram_quantile(), by()/without(), recording rules para performance, absent() para alertas.",            url:"https://prometheus.io/docs/prometheus/latest/querying/basics/" },
+      { id:"ko6",  title:"ServiceMonitors e PodMonitors",              desc:"Prometheus Operator CRDs, selector labels match Service/Pod, port names, scrapeInterval, tlsConfig.",                       url:"https://prometheus-operator.dev/docs/developer/getting-started/" },
+      { id:"ko7",  title:"Recording rules e alerting rules",           desc:"groups, interval, record: (pre-compute heavy queries), alert:, for: (pending duration), labels:, annotations: runbook_url.", url:"https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/" },
+      { id:"ko8",  title:"Dashboard design best practices",            desc:"USE method (Utilization/Saturation/Errors), RED method (Rate/Errors/Duration), golden signals, drill-down hierarchy.",       url:"https://grafana.com/docs/grafana/latest/dashboards/" },
+      { id:"ko9",  title:"Provisioning (dashboards as code)",          desc:"Grafana dashboard JSON via ConfigMap (sidecar), grafana-dashboards provider, Grafonnet/jsonnet para templating.",           url:"https://grafana.com/docs/grafana/latest/administration/provisioning/" },
+      { id:"ko10", title:"Loki: arquitetura e LogQL",                  desc:"Distributor → Ingester → Querier, log streams (labels-only index), LogQL: filter | pattern | metric expressions.",          url:"https://grafana.com/docs/loki/latest/" },
+      { id:"ko11", title:"Fluent Bit / Fluentd para coleta",           desc:"Fluent Bit (lightweight DaemonSet): INPUT → FILTER → OUTPUT; Fluentd como aggregator; parsers e routing.",                 url:"https://docs.fluentbit.io/" },
+      { id:"ko12", title:"OpenTelemetry overview",                     desc:"Vendor-neutral: APIs, SDKs, Collector. Substitui jaeger-client, zipkin-client, prometheus client. OTLP protocolo.",         url:"https://opentelemetry.io/docs/" },
+      { id:"ko13", title:"OTel Collector pipeline",                    desc:"receivers → processors (batch, filter, transform, tail-sampling) → exporters (OTLP, Prometheus, Loki, Tempo).",             url:"https://opentelemetry.io/docs/collector/" },
+      { id:"ko14", title:"Distributed tracing: spans e context",       desc:"Span: unidade de trabalho com start/end/attributes; Trace: DAG de spans; W3C TraceContext header para propagação.",         url:"https://opentelemetry.io/docs/concepts/signals/traces/" },
+      { id:"ko15", title:"Jaeger / Tempo para armazenamento",          desc:"Jaeger: all-in-one ou microservices com Cassandra/ES backend; Tempo: object storage, TraceQL query language.",              url:"https://grafana.com/docs/tempo/latest/" },
+    ]
+  },
+  {
+    id:"kb-platform", icon:"🏗️", title:"Platform Eng.", color:"#8b5cf6",
+    resources:[
+      { id:"kp1",  title:"O que é uma Internal Developer Platform",    desc:"Abstrações self-service sobre infra: golden paths, templates, environments, pipelines — reduz cognitive load.",            url:"https://platformengineering.org/blog/what-is-platform-engineering" },
+      { id:"kp2",  title:"Team Topologies",                            desc:"Stream-aligned, Platform, Enabling, Complicated-subsystem teams; interaction modes: collaboration, X-as-a-Service, facilitating.", url:"https://teamtopologies.com/book" },
+      { id:"kp3",  title:"Developer Experience (DevEx)",               desc:"SPACE framework: Satisfaction, Performance, Activity, Communication, Efficiency — medir o que importa para devs.",           url:"https://queue.acm.org/detail.cfm?id=3454124" },
+      { id:"kp4",  title:"Platform as a Product mindset",              desc:"Platform team = product team; developers = customers; NPS, feature requests, roadmap público, SLOs da plataforma.",          url:"https://platformengineering.org/blog/platform-as-a-product" },
+      { id:"kp5",  title:"Arquitetura do Backstage",                   desc:"Core: catalog, scaffolder, techdocs, search. Plugins: frontend (React) + backend (Express) + GraphQL resolver.",             url:"https://backstage.io/docs/overview/architecture-overview" },
+      { id:"kp6",  title:"Software Templates (Scaffolding)",           desc:"Template YAML: parameters → steps (fetch:template, publish:github, catalog:register) → output; cookiecutter style.",       url:"https://backstage.io/docs/features/software-templates/" },
+      { id:"kp7",  title:"TechDocs para documentação",                 desc:"MkDocs + techdocs-cli, S3/GCS backend para produção, addon ReportIssue, entity relationships via catalog.",                 url:"https://backstage.io/docs/features/techdocs/" },
+      { id:"kp8",  title:"Crossplane introduction",                    desc:"K8s-native IaC: Managed Resources → Composite Resources (XR) → Claims (XRC); reconciliation loop como K8s operator.",       url:"https://docs.crossplane.io/latest/getting-started/introduction/" },
+      { id:"kp9",  title:"Compositions e XRDs",                       desc:"XRD: define API schema + OpenAPI validation; Composition: maps XR → MRs; CompositeResourceClaim para developer self-service.", url:"https://docs.crossplane.io/latest/concepts/compositions/" },
+      { id:"kp10", title:"Backstage + Crossplane + ArgoCD",            desc:"Scaffolder template → cria XRC → Crossplane provisiona infra → ArgoCD faz deploy da app — golden path completo.",           url:"https://docs.crossplane.io/latest/" },
+      { id:"kp11", title:"Golden paths para desenvolvedores",          desc:"Opinioned paved road: template → repo → CI → staging → prod; reduz cognitive load e aumenta delivery speed.",              url:"https://engineering.atspotify.com/2020/08/how-we-use-golden-paths-to-solve-fragmentation-in-our-software-ecosystem/" },
+      { id:"kp12", title:"Métricas de plataforma",                     desc:"Adoption rate, DORA metrics, time-to-onboard new developer, platform NPS, incident reduction, self-service ratio.",          url:"https://dora.dev/research/" },
+      { id:"kp13", title:"Multi-tenancy strategies",                   desc:"Namespace-per-team, cluster-per-env, vcluster (virtual clusters); RBAC + NetworkPolicy + ResourceQuota por tenant.",         url:"https://kubernetes.io/docs/concepts/security/multi-tenancy/" },
+    ]
+  },
+  {
+    id:"kb-cloud", icon:"☁️", title:"Cloud & AWS", color:"#fb923c",
+    resources:[
+      { id:"kw1",  title:"EKS architecture e networking",              desc:"Managed control plane, VPC CNI (AWS VPC IPs per pod), kube-proxy iptables/IPVS, CoreDNS, managed node groups vs self-managed.", url:"https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html" },
+      { id:"kw2",  title:"EKS Blueprints",                             desc:"Terraform/CDK constructs para EKS: addons pré-configurados, teams RBAC, GitOps bootstrap com ArgoCD, curated patterns.",    url:"https://aws-ia.github.io/terraform-aws-eks-blueprints/" },
+      { id:"kw3",  title:"EKS add-ons management",                     desc:"Managed add-ons (vpc-cni, kube-proxy, coredns, ebs-csi-driver) via API ou Terraform; version lifecycle management.",          url:"https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html" },
+      { id:"kw4",  title:"Pod Identity (IRSA evolution)",              desc:"EKS Pod Identity: mais simples que IRSA (sem OIDC manual), EKS Auth API, podIdentityAssociation resource.",                  url:"https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html" },
+      { id:"kw5",  title:"EKS + Karpenter",                            desc:"NodePool (instance types, zones, capacity limits), NodeClass (AMI, SGs, subnets, userData), disruption budgets.",             url:"https://karpenter.sh/docs/" },
+      { id:"kw6",  title:"Spot/Preemptible instances",                 desc:"Karpenter spot support, 2min interruption warning via EC2 metadata, mixed instance types, fallback to on-demand.",           url:"https://karpenter.sh/docs/concepts/nodepools/" },
+      { id:"kw7",  title:"Kubecost / OpenCost",                        desc:"Cost per namespace/deployment/pod, showback vs chargeback, Prometheus integration + cost model, alerts de custo.",            url:"https://www.kubecost.com/" },
+      { id:"kw8",  title:"Transit Gateway e VPC patterns",             desc:"Hub-spoke topology, TGW route tables, VPC sharing, inter-region peering, centralized egress via NAT/Firewall VPC.",          url:"https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html" },
+      { id:"kw9",  title:"AWS Organizations e SCPs",                   desc:"OU hierarchy, SCPs = permission guardrails (NÃO grants), explicit Deny overrides Allow, aws:PrincipalOrgID condition.",       url:"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html" },
+      { id:"kw10", title:"IAM Identity Center",                        desc:"SSO para múltiplas contas AWS, permission sets reutilizáveis, SCIM provisioning de users/groups, MFA enforcement.",           url:"https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html" },
+      { id:"kw11", title:"GuardDuty, Security Hub",                    desc:"GuardDuty: threat detection ML (VPC logs, DNS, CloudTrail); Security Hub: aggregates findings, CSPM, compliance standards.", url:"https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html" },
+      { id:"kw12", title:"GCP/Azure: IAM model",                       desc:"GCP: bindings (member+role) com herança hierarchical; Azure: RBAC com scope (management group → subscription → resource).",  url:"https://cloud.google.com/iam/docs/overview" },
+      { id:"kw13", title:"GCP/Azure: Compute e Kubernetes",            desc:"GCP: GKE Autopilot/Standard; Azure: AKS managed control plane + VMSS node pools; diferenças vs EKS na gestão.",             url:"https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview" },
+    ]
+  },
+  {
+    id:"kb-mesh", icon:"🕸️", title:"Service Mesh", color:"#38bdf8",
+    resources:[
+      { id:"km1",  title:"Istio architecture",                         desc:"Control plane: Istiod (Pilot+Citadel+Galley). Data plane: Envoy sidecar proxy. xDS APIs para configuração dinâmica.",       url:"https://istio.io/latest/docs/ops/deployment/architecture/" },
+      { id:"km2",  title:"Traffic management",                         desc:"VirtualService (routing rules, retries, timeouts, fault injection), DestinationRule (LB, circuit breaker), Gateway.",        url:"https://istio.io/latest/docs/concepts/traffic-management/" },
+      { id:"km3",  title:"Security features (mTLS, AuthZ)",            desc:"PeerAuthentication (mTLS STRICT/PERMISSIVE), AuthorizationPolicy (ALLOW/DENY), RequestAuthentication (JWT JWKS).",           url:"https://istio.io/latest/docs/concepts/security/" },
+      { id:"km4",  title:"Observability features Istio",               desc:"Automatic metrics (istio_requests_total, latency histograms), Kiali service graph, Jaeger tracing, access logs.",            url:"https://istio.io/latest/docs/tasks/observability/" },
+      { id:"km5",  title:"Multi-cluster service mesh",                 desc:"Primary-remote vs multi-primary topologies; east-west gateway para cross-cluster; trust domain federation.",                 url:"https://istio.io/latest/docs/setup/install/multicluster/" },
+      { id:"km6",  title:"Canary deployment com Istio",                desc:"VirtualService weight split (90/10), DestinationRule subsets (v1/v2), progressive traffic shift com análise.",               url:"https://istio.io/latest/docs/tasks/traffic-management/traffic-shifting/" },
+      { id:"km7",  title:"Ambient mesh (sidecar-less)",                desc:"ztunnel (L4 mTLS e telemetry), waypoint proxy (L7 policies), sem sidecar injection — reduz resource overhead.",             url:"https://istio.io/latest/docs/ambient/overview/" },
+    ]
+  },
+  {
+    id:"kb-career", icon:"🎓", title:"Career", color:"#e879f9",
+    resources:[
+      { id:"kr1",  title:"Staff Engineer path vs Management",          desc:"Staff: technical leadership, architecture, influence. EM: people growth, process, delivery. Ambos são promoções válidas.",   url:"https://staffeng.com/guides/staff-archetypes/" },
+      { id:"kr2",  title:"Target companies/roles",                     desc:"Research: levels.fyi (compensation), glassdoor (culture), LinkedIn jobs (skills gap), tech blog (engineering quality).",     url:"https://levels.fyi/" },
+      { id:"kr3",  title:"GitHub profile atualizado",                  desc:"Pinned repos com README detalhado (problema → solução → arquitetura), contribuições OSS, GitHub Actions badges.",           url:"https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/" },
+      { id:"kr4",  title:"LinkedIn otimizado",                         desc:"Headline com keywords (Platform Engineer | EKS | Kubernetes | Terraform), About com narrativa, Featured projects.",          url:"https://www.linkedin.com/help/linkedin/answer/a549047" },
+      { id:"kr5",  title:"Behavioral questions (STAR method)",         desc:"Situation, Task, Action, Result; preparar 10 histórias: conflict, failure, leadership, impact, ambiguity.",                 url:"https://www.themuse.com/advice/star-interview-method" },
+      { id:"kr6",  title:"System design interview practice",           desc:"Clarify → Estimate → High-level → Deep dive → Trade-offs; 45min structure; praticar: URL shortener, chat, feed.",          url:"https://github.com/donnemartin/system-design-primer" },
+      { id:"kr7",  title:"Escrever blog post técnico",                 desc:"Dev.to, Hashnode, personal blog + crosspost LinkedIn; SEO com keywords técnicas; problema real → solução → learnings.",     url:"https://dev.to/" },
+      { id:"kr8",  title:"Participar de meetup/conferência",           desc:"Cloud Native Portugal, KubeCon EU/NA, HashiConf, SREcon; talk proposal → rehearse → slide deck public.",                    url:"https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/" },
+      { id:"kr9",  title:"Identificar projeto open source para contribuir", desc:"good-first-issue labels, areas: docs/tests/small features; ArgoCD, Flux, Crossplane, Cilium — ecossistema CNCF.",    url:"https://goodfirstissue.dev/" },
+      { id:"kr10", title:"Retrospectiva do Ano 1",                     desc:"O que aprendi vs planeado? CKA obtido? Gaps ainda existentes? Ajustar roadmap e settar objetivos para o Ano 2.",            url:"https://staffeng.com/guides/work-on-what-matters/" },
+    ]
+  },
+  {
+    id:"kb-lead", icon:"👥", title:"Leadership", color:"#34d399",
+    resources:[
+      { id:"kl1",  title:"Stakeholder management",                     desc:"Identify → understand interests → communicate proactively → manage expectations → align on decisions.",                      url:"https://lethain.com/getting-in-the-room/" },
+      { id:"kl2",  title:"Technical proposals (RFCs)",                 desc:"Problem → Context → Options (pros/cons) → Recommendation → Implementation plan → Risks → Decision.",                       url:"https://lethain.com/rfcs-and-design-documents/" },
+      { id:"kl3",  title:"Como dar feedback construtivo",              desc:"SBI: Situation, Behavior, Impact. Radical Candor: care personally + challenge directly. Timing importa.",                   url:"https://www.radicalcandor.com/" },
+      { id:"kl4",  title:"Code review como ensino",                    desc:"Explain WHY not just WHAT; ask questions vs dictate; NIT prefix para nitpicks; compliment good code patterns.",             url:"https://google.github.io/eng-practices/review/" },
+      { id:"kl5",  title:"Postmortems blameless",                      desc:"Timeline → Contributing factors (5 Whys, não culpa) → Action items (owner + deadline) → Partilhar amplamente.",            url:"https://sre.google/sre-book/postmortem-culture/" },
+      { id:"kl6",  title:"Incident command",                           desc:"IC role: coordinate, not fix; declare severity; loop update every 30min; delegate investigation; stakeholder comms.",       url:"https://sre.google/workbook/incident-response/" },
+      { id:"kl7",  title:"Chaos engineering basics",                   desc:"Hypothesis → inject failure → observe → improve; Game Day facilitation; define blast radius e rollback plan antes.",        url:"https://principledchaos.org/" },
+      { id:"kl8",  title:"ADRs (Architecture Decision Records)",        desc:"Context → Decision → Status → Consequences; date-stamped, versionado em /docs/adr/ no repo; imutável após accepted.",     url:"https://github.com/joelparkerhenderson/architecture-decision-record" },
+      { id:"kl9",  title:"Estimativas técnicas",                       desc:"3-point estimation (optimistic/realistic/pessimistic), reference class forecasting, spike first para incerteza.",           url:"https://leaddev.com/tech/better-technical-estimates" },
+      { id:"kl10", title:"Storytelling técnico",                       desc:"Hook → Problem → Solution → Impact; evitar jargão com exec audience; usar analogias; demo > slides sempre.",               url:"https://leaddev.com/communication-relationships/technical-storytelling" },
+    ]
+  },
+];
+
+
 export default function StudyPlanner() {
   const [activePhase, setActivePhase] = useState("p1");
   const [completed, setCompleted] = useState({});
@@ -1218,17 +1405,26 @@ export default function StudyPlanner() {
   const [view, setView] = useState("planner");
   const [tsSearch, setTsSearch] = useState("");
   const [tsCategory, setTsCategory] = useState("all");
+  const [nSearch, setNSearch] = useState("");
+  const [nCategory, setNCategory] = useState("all");
+  const [kbDone, setKbDone] = useState({});
 
   useEffect(() => {
     (async () => {
-        try { const c = localStorage.getItem("sreplanner-completed"); if (c) setCompleted(JSON.parse(c)); } catch {}
-        try { const e = localStorage.getItem("sreplanner-expanded");  if (e) setExpandedWeeks(JSON.parse(e)); } catch {}
+      try { const c = localStorage.getItem("sreplanner-completed"); if (c) setCompleted(JSON.parse(c)); } catch {}
+      try { const e = localStorage.getItem("sreplanner-expanded");  if (e) setExpandedWeeks(JSON.parse(e)); } catch {}
+      try { const k = localStorage.getItem("sreplanner-kb");         if (k) setKbDone(JSON.parse(k)); } catch {}
       setLoaded(true);
     })();
   }, []);
 
   const saveCompleted = (next) => { try { localStorage.setItem("sreplanner-completed", JSON.stringify(next)); } catch {} };
   const saveExpanded  = (next) => { try { localStorage.setItem("sreplanner-expanded",  JSON.stringify(next)); } catch {} };
+  const toggleKb = (id) => {
+    const n = {...kbDone, [id]: !kbDone[id]};
+    setKbDone(n);
+    try { localStorage.setItem("sreplanner-kb", JSON.stringify(n)); } catch {}
+  };
 
   const toggleItem = (id) => { const n = {...completed, [id]: !completed[id]}; setCompleted(n); saveCompleted(n); };
   const toggleWeek = (id) => { const n = {...expandedWeeks, [id]: !expandedWeeks[id]}; setExpandedWeeks(n); saveExpanded(n); };
@@ -1331,6 +1527,7 @@ export default function StudyPlanner() {
           {[
             { id: "planner",        label: "📚 Planner",         subtitle: "144 semanas" },
             { id: "troubleshooting",label: "🔧 Troubleshooting", subtitle: "referência rápida" },
+            { id: "notion",           label: "📚 Knowledge",        subtitle: "docs & progress" },
           ].map(tab => (
             <button key={tab.id} onClick={() => setView(tab.id)} style={{
               padding: "10px 18px", background: "transparent", border: "none", borderBottom: `2px solid ${view === tab.id ? "#f59e0b" : "transparent"}`,
@@ -1343,7 +1540,7 @@ export default function StudyPlanner() {
           ))}
         </div>
 
-        {view === "planner" ? (<>
+        {view === "planner" && (<>
         {/* ── Planner header ── */}
         <div style={{ padding: "16px 20px", borderBottom: "1px solid #1a1a22", background: "#0f0f14", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -1443,7 +1640,8 @@ export default function StudyPlanner() {
             </div>
           ))}
         </div>
-        </>) : (<>
+        </>)}
+        {view === "troubleshooting" && (<>
 
         {/* ── Troubleshooting header ── */}
         <div style={{ padding: "14px 20px", borderBottom: "1px solid #1a1a22", background: "#0f0f14", flexShrink: 0 }}>
@@ -1512,6 +1710,90 @@ export default function StudyPlanner() {
                         </div>
                       </a>
                     ))}
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+        </>)}
+        {view === "notion" && (<>
+        {/* ── Knowledge Base header ── */}
+        <div style={{ padding: "14px 20px", borderBottom: "1px solid #1a1a22", background: "#0f0f14", flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <input
+              value={nSearch} onChange={e => setNSearch(e.target.value)}
+              placeholder="🔍  Pesquisar tópico..."
+              style={{ flex: 1, minWidth: 200, padding: "7px 12px", background: "#141418", border: "1px solid #222228", borderRadius: 6, color: "#e2e8f0", fontSize: 11, fontFamily: "inherit", outline: "none" }}
+            />
+            <div style={{ fontSize: 10, color: "#334155", whiteSpace: "nowrap" }}>
+              {(() => {
+                const q = nSearch.toLowerCase();
+                const cats = nCategory === "all" ? KB : KB.filter(c => c.id === nCategory);
+                const total = cats.flatMap(c => c.resources).filter(r => !q || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q)).length;
+                const done = cats.flatMap(c => c.resources).filter(r => kbDone[r.id] && (!q || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q))).length;
+                return `${done}/${total} concluídos`;
+              })()}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 5, marginTop: 10, flexWrap: "wrap" }}>
+            {[{ id: "all", label: "Todos", icon: "📚" }, ...KB.map(c => ({ id: c.id, label: c.title, icon: c.icon, color: c.color }))].map(cat => (
+              <button key={cat.id} onClick={() => setNCategory(cat.id)} style={{
+                padding: "3px 10px", fontSize: 10, fontFamily: "inherit", cursor: "pointer", borderRadius: 20,
+                background: nCategory === cat.id ? (cat.color ? `${cat.color}20` : "#8b5cf620") : "#141418",
+                border: `1px solid ${nCategory === cat.id ? (cat.color || "#8b5cf6") + "50" : "#222228"}`,
+                color: nCategory === cat.id ? (cat.color || "#8b5cf6") : "#475569",
+                transition: "all 0.15s",
+              }}>
+                {cat.icon} {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* ── Knowledge Base content ── */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+          {(() => {
+            const q = nSearch.toLowerCase();
+            const cats = nCategory === "all" ? KB : KB.filter(c => c.id === nCategory);
+            return cats.map(cat => {
+              const filtered = cat.resources.filter(r => !q || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
+              if (!filtered.length) return null;
+              const catDone = filtered.filter(r => kbDone[r.id]).length;
+              return (
+                <div key={cat.id} style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "#334155", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid #141418", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{cat.icon}</span>
+                    <span style={{ color: cat.color }}>{cat.title}</span>
+                    <span style={{ color: "#1e1e28" }}>· {catDone}/{filtered.length}</span>
+                    {catDone === filtered.length && filtered.length > 0 && <span style={{ color: "#22c55e", fontSize: 9 }}>✓ completo</span>}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 8 }}>
+                    {filtered.map(r => {
+                      const done = kbDone[r.id];
+                      return (
+                        <div key={r.id}
+                          style={{ display: "flex", flexDirection: "column", gap: 6, padding: "12px 14px", background: done ? "#0a1a0f" : "#0f0f14", border: `1px solid ${done ? "#16532d40" : "#1a1a22"}`, borderLeft: `3px solid ${done ? "#22c55e" : cat.color}`, borderRadius: 7, transition: "all 0.2s" }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                            <div onClick={() => toggleKb(r.id)}
+                              style={{ width: 15, height: 15, borderRadius: 3, border: `1.5px solid ${done ? "#22c55e" : cat.color + "70"}`, background: done ? "#22c55e" : "transparent", flexShrink: 0, marginTop: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s" }}>
+                              {done && <span style={{ fontSize: 9, color: "#000", fontWeight: 700 }}>✓</span>}
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: done ? "#334155" : "#e2e8f0", lineHeight: 1.4, textDecoration: done ? "line-through" : "none", transition: "all 0.15s" }}>{r.title}</div>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: 10, color: done ? "#334155" : "#475569", lineHeight: 1.6, paddingLeft: 23 }}>{r.desc}</div>
+                          <div style={{ paddingLeft: 23 }}>
+                            <a href={r.url} target="_blank" rel="noopener noreferrer"
+                              style={{ fontSize: 9, color: cat.color, opacity: done ? 0.4 : 0.7, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 8px", background: `${cat.color}12`, border: `1px solid ${cat.color}25`, borderRadius: 10, transition: "opacity 0.15s" }}
+                              onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+                              onMouseLeave={e => e.currentTarget.style.opacity = done ? "0.4" : "0.7"}>
+                              → documentação oficial
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
